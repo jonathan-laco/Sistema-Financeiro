@@ -46,6 +46,32 @@
       href="{{ url_for('static', filename='uploads/css/base.css') }}"
     />
     {% block extra_css %}{% endblock %}
+      <style>
+        @media (max-width: 767px) {
+          .content-wrapper,
+          .container-fluid.page-transition {
+            padding-bottom: 70px;
+          }
+          .main-footer {
+            background: #f8f9fa;
+            color: #6c757d;
+            text-align: center;
+            padding: 12px 0;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            border-top: 1px solid #dee2e6;
+            z-index: 999;
+          }
+        }
+        @media (min-width: 768px) {
+          .main-footer {
+            position: static;
+            border-top: none;
+          }
+        }
+      </style>
   </head>
 
   <body

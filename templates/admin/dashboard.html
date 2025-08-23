@@ -228,16 +228,17 @@ block content %}
         </div>
       </div>
       <div class="card-body p-0">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Usuário</th>
-              <th>Email</th>
-              <th>Último Login</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for user in user_stats.recent_logins %}
+        <div style="overflow-x: auto;">
+          <table class="table table-striped" style="min-width: 600px;">
+            <thead>
+              <tr>
+                <th>Usuário</th>
+                <th>Email</th>
+                <th>Último Login</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in user_stats.recent_logins %}
             <tr>
               <td>{{ user.username }}</td>
               <td>{{ user.email }}</td>

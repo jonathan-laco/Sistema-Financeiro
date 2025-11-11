@@ -1,18 +1,20 @@
 from models import BankAccount, Transaction
 from extensions import db
 from flask import flash
+from datetime import datetime
 
 def get_user_accounts(user_id):
     """
     Retorna todas as contas de um usuário
     """
-    return BankAccount.query.filter_by(user_id=user_id).all()
+    # Ignorar contas marcadas como deletadas
+    return BankAccount.query.filter_by(user_id=user_id, is_deleted=False).all()
 
 def get_account_by_id(account_id, user_id):
     """
     Retorna uma conta específica de um usuário
     """
-    return BankAccount.query.filter_by(id=account_id, user_id=user_id).first()
+    return BankAccount.query.filter_by(id=account_id, user_id=user_id, is_deleted=False).first()
 
 def create_account(user_id, name, initial_balance=0.0):
     """
@@ -51,20 +53,17 @@ def update_account(account_id, user_id, name):
 
 def delete_account(account_id, user_id):
     """
-    Exclui uma conta bancária se não houver transações associadas
+    Exclui (soft-delete) uma conta bancária. Marca como deletada para fins de auditoria.
     """
     account = get_account_by_id(account_id, user_id)
     if not account:
         return False, "Conta não encontrada"
-    
-    # Verificar se existem transações associadas a esta conta
-    transactions = Transaction.query.filter_by(account_id=account_id).first()
-    if transactions:
-        return False, "Não é possível excluir esta conta pois existem transações associadas a ela"
-    
-    db.session.delete(account)
+    # Marcar a conta como deletada (soft-delete) mesmo que existam transações,
+    # para preservar histórico e cumprir auditoria.
+    account.is_deleted = True
+    account.deleted_at = datetime.utcnow()
     db.session.commit()
-    return True, "Conta excluída com sucesso"
+    return True, "Conta marcada como excluída (soft-delete) com sucesso"
 
 def calculate_total_balance(user_id):
     """

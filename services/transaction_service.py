@@ -197,10 +197,11 @@ def delete_transaction(transaction_id, user_id):
         from services.invoice_service import delete_invoice
         delete_invoice(invoice.id, user_id)
     
-    # Excluir a transação
-    db.session.delete(transaction)
+    
+    transaction.status = 'cancelado'
+    transaction.is_confirmed = False
     db.session.commit()
-    return True, "Transação excluída com sucesso"
+    return True, "Transação cancelada (mantida para auditoria) com sucesso"
 
 def confirm_transaction(transaction_id, user_id):
     """

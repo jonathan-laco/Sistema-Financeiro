@@ -14,6 +14,9 @@ class User(db.Model, UserMixin):
     dashboard_layout = db.Column(db.Text)  # JSON para armazenar layout do dashboard
     is_admin = db.Column(db.Boolean, default=False)  # Flag para administrador
     is_active = db.Column(db.Boolean, default=True)  # Flag para conta ativa/inativa
+    # Soft-delete fields
+    is_deleted = db.Column(db.Boolean, default=False)
+    deleted_at = db.Column(db.DateTime, nullable=True)
     approval_status = db.Column(db.String(20), default='approved')  # 'pending', 'approved', 'rejected'
     is_mei = db.Column(db.Boolean, default=False)  # Flag para MEI
     mei_cnpj = db.Column(db.String(18))  # CNPJ do MEI

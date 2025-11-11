@@ -28,7 +28,8 @@ def get_all_users():
     """
     Retorna todos os usuários
     """
-    return User.query.all()
+    # Por padrão, retornar apenas usuários que não foram marcados como deletados
+    return User.query.filter_by(is_deleted=False).all()
 
 def create_user(username, email, password, full_name='', is_admin=False, is_mei=False, mei_cnpj=None, mei_company_name=None):
     """
@@ -247,45 +248,23 @@ def delete_user(user_id):
     """
     Exclui um usuário e todos os seus dados
     """
-    from models import User, Transaction, BankAccount, Category, Invoice, Goal, UserAccessLog
-    
+    from models import User
+
     user = User.query.get(user_id)
     if not user:
         return False, "Usuário não encontrado"
-    
+
     # Não permitir excluir o administrador principal
     if user.is_admin and user.email == 'admin@admin.com':
         return False, "Não é possível excluir o administrador principal"
-    
-    # Excluir todos os dados do usuário
-    # Excluir todas as notas fiscais do usuário
-    invoices = Invoice.query.filter_by(user_id=user_id).all()
-    for invoice in invoices:
-        # Excluir arquivo
-        from services.invoice_service import delete_invoice
-        delete_invoice(invoice.id, user_id)
-    
-    # Excluir todas as transações do usuário
-    Transaction.query.filter_by(user_id=user_id).delete()
-    
-    # Excluir todas as contas do usuário
-    BankAccount.query.filter_by(user_id=user_id).delete()
-    
-    # Excluir todas as categorias do usuário
-    Category.query.filter_by(user_id=user_id).delete()
 
-    
-    # Excluir todas as metas do usuário
-    Goal.query.filter_by(user_id=user_id).delete()
-    
-    # Excluir todos os logs de acesso do usuário
-    UserAccessLog.query.filter_by(user_id=user_id).delete()
-    
-    # Finalmente, excluir o usuário
-    db.session.delete(user)
+    # Marcar usuário como deletado para fins de auditoria (soft-delete)
+    user.is_deleted = True
+    user.deleted_at = datetime.utcnow()
+    user.is_active = False
     db.session.commit()
-    
-    return True, "Usuário excluído com sucesso"
+
+    return True, "Usuário marcado como excluído (soft-delete) com sucesso"
 
 def approve_user(user_id):
     """
@@ -331,18 +310,19 @@ def get_user_statistics():
     """
     Retorna estatísticas sobre os usuários
     """
-    total_users = User.query.count()
-    active_users = User.query.filter_by(is_active=True).count()
-    inactive_users = User.query.filter_by(is_active=False).count()
-    admin_users = User.query.filter_by(is_admin=True).count()
-    mei_users = User.query.filter_by(is_mei=True).count()
-    pending_users = User.query.filter_by(approval_status='pending').count()
-    
-    # Usuários mais recentes
-    recent_users = User.query.order_by(User.created_at.desc()).limit(5).all()
-    
-    # Usuários com login mais recente
-    recent_logins = User.query.filter(User.last_login != None).order_by(User.last_login.desc()).limit(5).all()
+    # Não contar usuários marcados como deletados nas estatísticas gerais
+    total_users = User.query.filter_by(is_deleted=False).count()
+    active_users = User.query.filter_by(is_active=True, is_deleted=False).count()
+    inactive_users = User.query.filter_by(is_active=False, is_deleted=False).count()
+    admin_users = User.query.filter_by(is_admin=True, is_deleted=False).count()
+    mei_users = User.query.filter_by(is_mei=True, is_deleted=False).count()
+    pending_users = User.query.filter_by(approval_status='pending', is_deleted=False).count()
+
+    # Usuários mais recentes (não deletados)
+    recent_users = User.query.filter_by(is_deleted=False).order_by(User.created_at.desc()).limit(5).all()
+
+    # Usuários com login mais recente (não deletados)
+    recent_logins = User.query.filter(User.last_login != None, User.is_deleted == False).order_by(User.last_login.desc()).limit(5).all()
     
     return {
         'total_users': total_users,

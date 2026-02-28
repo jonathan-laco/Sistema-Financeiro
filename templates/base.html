@@ -71,6 +71,38 @@
             border-top: none;
           }
         }
+
+        /* Estilos de impressão */
+        .no-print {
+          display: block;
+        }
+
+        /* Versão paginada - visível na tela, oculta na impressão */
+        .paginated-transactions {
+          display: block;
+        }
+
+        /* Versão de impressão - oculta na tela, visível na impressão */
+        .all-transactions {
+          display: none;
+        }
+
+        @media print {
+          /* Na impressão, oculta a versão paginada */
+          .paginated-transactions {
+            display: none;
+          }
+
+          /* Na impressão, mostra a versão completa */
+          .all-transactions {
+            display: block;
+          }
+
+          /* Esconde elementos marcados como no-print na impressão */
+          .no-print {
+            display: none !important;
+          }
+        }
       </style>
   </head>
 

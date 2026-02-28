@@ -91,12 +91,19 @@ def add():
         # Se o usuário for MEI, todas as transações são automaticamente MEI
         is_mei_transaction = current_user.is_mei
         
-        # Usar a data atual correta
-        current_date = get_now_sp()
+        # Obter a data da transação (se fornecida) ou usar a data atual
+        transaction_date_str = request.form.get('transaction_date')
+        if transaction_date_str:
+            try:
+                transaction_date = datetime.strptime(transaction_date_str, '%Y-%m-%d')
+            except ValueError:
+                transaction_date = get_now_sp()
+        else:
+            transaction_date = get_now_sp()
         
         transaction, message = transaction_service.create_transaction(
             current_user.id, account_id, category_id, transaction_type, 
-            amount, description, is_confirmed, is_mei_transaction, current_date
+            amount, description, is_confirmed, is_mei_transaction, transaction_date
         )
         
         if not transaction:

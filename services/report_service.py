@@ -50,7 +50,19 @@ def get_expense_categories_data(user_id, month, year):
 def get_daily_data(user_id, month, year):
     """
     Retorna dados diários de receitas e despesas para um mês específico
+    Inclui todos os dias do mês, mesmo aqueles sem transações
     """
+    import calendar
+    
+    # Obter o número de dias do mês
+    num_days = calendar.monthrange(year, month)[1]
+    
+    # Inicializar daily_data com todos os dias do mês
+    daily_data = {}
+    for day in range(1, num_days + 1):
+        daily_data[day] = {'receita': 0, 'despesa': 0}
+    
+    # Obter transações do mês
     transactions = Transaction.query.filter_by(
         user_id=user_id,
         status='confirmado'
@@ -59,15 +71,10 @@ def get_daily_data(user_id, month, year):
         extract('year', Transaction.date) == year
     ).all()
     
-    daily_data = {}
+    # Adicionar transações aos dados diários
     for t in transactions:
         day = t.date.day
-        if day not in daily_data:
-            daily_data[day] = {'receita': 0, 'despesa': 0}
         daily_data[day][t.type] += t.amount
-    
-    # Ordenar por dia
-    daily_data = {k: daily_data[k] for k in sorted(daily_data.keys())}
     
     return daily_data
 

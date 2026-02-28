@@ -71,6 +71,38 @@
             border-top: none;
           }
         }
+
+        /* Estilos de impressão */
+        .no-print {
+          display: block;
+        }
+
+        /* Versão paginada - visível na tela, oculta na impressão */
+        .paginated-transactions {
+          display: block;
+        }
+
+        /* Versão de impressão - oculta na tela, visível na impressão */
+        .all-transactions {
+          display: none;
+        }
+
+        @media print {
+          /* Na impressão, oculta a versão paginada */
+          .paginated-transactions {
+            display: none;
+          }
+
+          /* Na impressão, mostra a versão completa */
+          .all-transactions {
+            display: block;
+          }
+
+          /* Esconde elementos marcados como no-print na impressão */
+          .no-print {
+            display: none !important;
+          }
+        }
       </style>
   </head>
 
@@ -263,11 +295,17 @@
                   href="{{ url_for('transactions.index') }}"
                   class="nav-link {% if request.path == url_for('transactions.index') %}active{% endif %}"
                 >
-                  <i class="nav-icon fas fa-exchange-alt"></i>
-                  <p>
-                    {% if current_user.is_mei %}Transações MEI{% else
-                    %}Transações{% endif %}
-                  </p>
+                  <i class="nav-icon fas fa-list"></i>
+                  <p>Listar Transações</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  href="{{ url_for('transactions.add') }}"
+                  class="nav-link {% if request.path == url_for('transactions.add') %}active{% endif %}"
+                >
+                  <i class="nav-icon fas fa-plus-circle"></i>
+                  <p>Adicionar Transação</p>
                 </a>
               </li>
 

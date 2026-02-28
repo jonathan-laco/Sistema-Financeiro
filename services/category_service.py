@@ -96,19 +96,65 @@ def toggle_category_status(category_id, user_id):
     status = 'ativada' if category.is_active else 'desativada'
     return category, f"Categoria {status} com sucesso"
 
+def delete_category(category_id, user_id):
+    """
+    Deleta uma categoria de um usuário
+    """
+    category = get_category_by_id(category_id, user_id)
+    if not category:
+        return None, "Categoria não encontrada"
+    
+    # Verificar se há transações associadas a esta categoria
+    transactions = Transaction.query.filter_by(category_id=category_id).first()
+    if transactions:
+        return None, "Não é possível deletar esta categoria pois existem transações associadas a ela"
+    
+    db.session.delete(category)
+    db.session.commit()
+    return True, "Categoria deletada com sucesso"
+
 def create_default_categories(user_id):
     """
     Cria categorias padrão para um novo usuário
     """
-    default_income_categories = ['Salário', 'Investimentos', 'Freelance', 'Presente', 'Outros']
-    default_expense_categories = ['Alimentação', 'Moradia', 'Transporte', 'Saúde', 'Educação', 'Lazer', 'Outros']
+    # Categorias de receita com cores diferentes
+    income_categories = [
+        {'name': 'Salário', 'color': '#28a745'},  # Verde
+        {'name': 'Investimentos', 'color': '#20c997'},  # Teal
+        {'name': 'Freelance', 'color': '#17a2b8'},  # Azul claro
+        {'name': 'Presente', 'color': '#ffc107'},  # Amarelo
+        {'name': 'Outros', 'color': '#6c757d'}  # Cinza
+    ]
     
-    for cat in default_income_categories:
-        new_category = Category(name=cat, type='receita', user_id=user_id, is_active=True)
+    # Categorias de despesa com cores diferentes
+    expense_categories = [
+        {'name': 'Alimentação', 'color': '#dc3545'},  # Vermelho
+        {'name': 'Moradia', 'color': '#e83e8c'},  # Rosa
+        {'name': 'Transporte', 'color': '#fd7e14'},  # Laranja
+        {'name': 'Saúde', 'color': '#6f42c1'},  # Roxo
+        {'name': 'Educação', 'color': '#0275d8'},  # Azul
+        {'name': 'Lazer', 'color': '#4169e1'},  # Azul royal
+        {'name': 'Outros', 'color': '#6c757d'}  # Cinza
+    ]
+    
+    for cat_dict in income_categories:
+        new_category = Category(
+            name=cat_dict['name'], 
+            type='receita', 
+            user_id=user_id, 
+            is_active=True,
+            color=cat_dict['color']
+        )
         db.session.add(new_category)
     
-    for cat in default_expense_categories:
-        new_category = Category(name=cat, type='despesa', user_id=user_id, is_active=True)
+    for cat_dict in expense_categories:
+        new_category = Category(
+            name=cat_dict['name'], 
+            type='despesa', 
+            user_id=user_id, 
+            is_active=True,
+            color=cat_dict['color']
+        )
         db.session.add(new_category)
     
     db.session.commit()

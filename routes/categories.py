@@ -65,3 +65,15 @@ def update(category_id):
         flash(message, 'success')
     
     return redirect(url_for('categories.index'))
+
+@categories_bp.route('/delete/<int:category_id>')
+@login_required
+def delete(category_id):
+    category, message = category_service.delete_category(category_id, current_user.id)
+    
+    if not category:
+        flash(message, 'warning')
+    else:
+        flash(message, 'success')
+    
+    return redirect(url_for('categories.index'))

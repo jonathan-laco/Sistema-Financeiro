@@ -50,6 +50,20 @@
           <label for="description">Descrição</label>
           <input type="text" class="form-control" id="description" name="description" placeholder="Ex: Salário, Aluguel, etc." required>
         </div>
+
+        <!-- Campo de Data (inicialmente oculto) -->
+        <div class="form-group" id="date_group" style="display: none;">
+          <label for="transaction_date">Data da Transação</label>
+          <input type="date" class="form-control" id="transaction_date" name="transaction_date">
+          <small class="form-text text-muted">Selecione a data da transação. Se deixar em branco, será usada a data atual.</small>
+        </div>
+
+        <!-- Botão para mostrar/esconder o campo de data -->
+        <div class="form-group">
+          <button type="button" class="btn btn-sm btn-outline-info" id="toggle_date_btn">
+            <i class="fas fa-calendar-alt"></i> Transação de outro dia? Clique aqui
+          </button>
+        </div>
         
         <div class="form-group">
           <label for="category_id">Categoria</label>
@@ -233,6 +247,35 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       this.style.borderColor = '';
       this.style.boxShadow = '';
+    }
+  });
+
+  // Funcionalidade para mostrar/esconder o campo de data
+  const toggleDateBtn = document.getElementById('toggle_date_btn');
+  const dateGroup = document.getElementById('date_group');
+  const transactionDate = document.getElementById('transaction_date');
+  
+  // Definir a data atual como padrão
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  transactionDate.value = `${year}-${month}-${day}`;
+  
+  // Toggle do campo de data
+  toggleDateBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    if (dateGroup.style.display === 'none') {
+      dateGroup.style.display = 'block';
+      toggleDateBtn.classList.remove('btn-outline-info');
+      toggleDateBtn.classList.add('btn-info');
+      toggleDateBtn.innerHTML = '<i class="fas fa-calendar-alt"></i> Fechar calendário';
+      transactionDate.focus();
+    } else {
+      dateGroup.style.display = 'none';
+      toggleDateBtn.classList.remove('btn-info');
+      toggleDateBtn.classList.add('btn-outline-info');
+      toggleDateBtn.innerHTML = '<i class="fas fa-calendar-alt"></i> Transação de outro dia? Clique aqui';
     }
   });
   

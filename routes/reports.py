@@ -83,6 +83,17 @@ def index():
         # Contar total de transações
         total_all_transactions = transaction_service.count_all_user_transactions(current_user.id)
         
+        # Dados para gráficos (mesmo para relatório anual, para manter a estrutura)
+        expense_categories, expense_colors = report_service.get_expense_categories_data(
+            current_user.id, month, year
+        )
+        daily_data = report_service.get_daily_data(
+            current_user.id, month, year
+        )
+        monthly_data = report_service.get_monthly_data(
+            current_user.id, month, year
+        )
+        
         return render_template(
             'reports.html',
             total_income=total_income,
@@ -97,7 +108,11 @@ def index():
             annual_income=annual_income,
             annual_expense=annual_expense,
             annual_data=annual_data,
-            period=period
+            period=period,
+            expense_categories=expense_categories,
+            expense_colors=expense_colors,
+            daily_data=daily_data,
+            monthly_data=monthly_data
         )
     else:
         # Relatório mensal (código existente)

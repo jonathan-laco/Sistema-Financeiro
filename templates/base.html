@@ -295,11 +295,17 @@
                   href="{{ url_for('transactions.index') }}"
                   class="nav-link {% if request.path == url_for('transactions.index') %}active{% endif %}"
                 >
-                  <i class="nav-icon fas fa-exchange-alt"></i>
-                  <p>
-                    {% if current_user.is_mei %}Transações MEI{% else
-                    %}Transações{% endif %}
-                  </p>
+                  <i class="nav-icon fas fa-list"></i>
+                  <p>Listar Transações</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  href="{{ url_for('transactions.add') }}"
+                  class="nav-link {% if request.path == url_for('transactions.add') %}active{% endif %}"
+                >
+                  <i class="nav-icon fas fa-plus-circle"></i>
+                  <p>Adicionar Transação</p>
                 </a>
               </li>
 

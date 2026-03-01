@@ -23,7 +23,7 @@ def create_invoice(user_id, transaction_id, file, invoice_number=None, invoice_d
     Cria uma nova nota fiscal
     """
     # Verificar se a transação existe e pertence ao usuário
-    transaction = Transaction.query.filter_by(id=transaction_id, user_id=user_id).first()
+    transaction = Transaction.query.filter_by(id=transaction_id, user_id=user_id, is_deleted=False).first()
     if not transaction:
         return None, "Transação não encontrada"
     

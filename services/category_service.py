@@ -83,7 +83,8 @@ def toggle_category_status(category_id, user_id):
         # Verificar se há transações pendentes usando esta categoria
         pending_transactions = Transaction.query.filter_by(
             category_id=category.id, 
-            status='pendente'
+            status='pendente',
+            is_deleted=False
         ).first()
         
         if pending_transactions:
@@ -105,7 +106,7 @@ def delete_category(category_id, user_id):
         return None, "Categoria não encontrada"
     
     # Verificar se há transações associadas a esta categoria
-    transactions = Transaction.query.filter_by(category_id=category_id).first()
+    transactions = Transaction.query.filter_by(category_id=category_id, is_deleted=False).first()
     if transactions:
         return None, "Não é possível deletar esta categoria pois existem transações associadas a ela"
     

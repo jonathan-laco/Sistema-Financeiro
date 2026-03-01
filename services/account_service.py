@@ -58,12 +58,17 @@ def delete_account(account_id, user_id):
     account = get_account_by_id(account_id, user_id)
     if not account:
         return False, "Conta não encontrada"
+    
+    # Verificar se a conta possui saldo
+    if account.balance != 0:
+        return False, "Não é possível excluir uma conta com saldo"
+    
     # Marcar a conta como deletada (soft-delete) mesmo que existam transações,
     # para preservar histórico e cumprir auditoria.
     account.is_deleted = True
     account.deleted_at = datetime.utcnow()
     db.session.commit()
-    return True, "Conta marcada como excluída (soft-delete) com sucesso"
+    return True, "Conta excluída com sucesso"
 
 def calculate_total_balance(user_id):
     """

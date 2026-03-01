@@ -8,7 +8,7 @@ def get_user_transactions(user_id, filters=None, page=1, per_page=20):
     """
     Retorna as transações de um usuário com filtros e paginação
     """
-    query = Transaction.query.filter_by(user_id=user_id)
+    query = Transaction.query.filter_by(user_id=user_id, is_deleted=False)
     
     if filters:
         if 'account_id' in filters and filters['account_id']:
@@ -36,7 +36,7 @@ def get_all_user_transactions(user_id, filters=None):
     Retorna todas as transações de um usuário com filtros, sem paginação
     Usado para relatórios de impressão
     """
-    query = Transaction.query.filter_by(user_id=user_id)
+    query = Transaction.query.filter_by(user_id=user_id, is_deleted=False)
     
     if filters:
         if 'account_id' in filters and filters['account_id']:
@@ -63,7 +63,7 @@ def get_transaction_by_id(transaction_id, user_id):
     """
     Retorna uma transação específica de um usuário
     """
-    return Transaction.query.filter_by(id=transaction_id, user_id=user_id).first()
+    return Transaction.query.filter_by(id=transaction_id, user_id=user_id, is_deleted=False).first()
 
 def create_transaction(user_id, account_id, category_id, transaction_type, amount, description, is_confirmed=True, is_mei_transaction=False, transaction_date=None):
     """
@@ -197,11 +197,11 @@ def delete_transaction(transaction_id, user_id):
         from services.invoice_service import delete_invoice
         delete_invoice(invoice.id, user_id)
     
-    
-    transaction.status = 'cancelado'
-    transaction.is_confirmed = False
+    # Marcar como deletada (soft-delete)
+    transaction.is_deleted = True
+    transaction.deleted_at = datetime.utcnow()
     db.session.commit()
-    return True, "Transação cancelada (mantida para auditoria) com sucesso"
+    return True, "Transação excluída com sucesso"
 
 def confirm_transaction(transaction_id, user_id):
     """
@@ -249,13 +249,13 @@ def get_recent_transactions(user_id, limit=5):
     """
     Retorna as transações mais recentes de um usuário
     """
-    return Transaction.query.filter_by(user_id=user_id).order_by(Transaction.date.desc()).limit(limit).all()
+    return Transaction.query.filter_by(user_id=user_id, is_deleted=False).order_by(Transaction.date.desc()).limit(limit).all()
 
 def get_pending_transactions(user_id):
     """
     Retorna as transações pendentes de um usuário
     """
-    return Transaction.query.filter_by(user_id=user_id, status='pendente').order_by(Transaction.date.desc()).all()
+    return Transaction.query.filter_by(user_id=user_id, status='pendente', is_deleted=False).order_by(Transaction.date.desc()).all()
 
 def calculate_monthly_totals(user_id, month, year, is_mei_only=False):
     """
@@ -263,7 +263,8 @@ def calculate_monthly_totals(user_id, month, year, is_mei_only=False):
     """
     query = Transaction.query.filter_by(
         user_id=user_id,
-        status='confirmado'
+        status='confirmado',
+        is_deleted=False
     ).filter(
         extract('month', Transaction.date) == month,
         extract('year', Transaction.date) == year
@@ -283,13 +284,13 @@ def count_all_user_transactions(user_id):
     """
     Retorna o número total de transações de um usuário
     """
-    return Transaction.query.filter_by(user_id=user_id).count()
+    return Transaction.query.filter_by(user_id=user_id, is_deleted=False).count()
 
 def count_filtered_transactions(user_id, filters=None):
     """
     Retorna o número de transações de um usuário com filtros aplicados
     """
-    query = Transaction.query.filter_by(user_id=user_id)
+    query = Transaction.query.filter_by(user_id=user_id, is_deleted=False)
     
     if filters:
         if 'account_id' in filters and filters['account_id']:
@@ -318,7 +319,8 @@ def get_mei_transactions(user_id, page=1, per_page=20):
     """
     return Transaction.query.filter_by(
         user_id=user_id,
-        is_mei_transaction=True
+        is_mei_transaction=True,
+        is_deleted=False
     ).order_by(Transaction.date.desc()).paginate(page=page, per_page=per_page, error_out=False)
 
 def calculate_mei_totals(user_id, month, year):

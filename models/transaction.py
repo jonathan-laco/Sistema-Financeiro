@@ -14,6 +14,8 @@ class Transaction(db.Model):
     status = db.Column(db.String(20), default='confirmado')  # 'confirmado', 'pendente', 'cancelado'
     is_mei_transaction = db.Column(db.Boolean, default=False)  # Flag para transação MEI
     has_invoice = db.Column(db.Boolean, default=False)  # Flag para indicar se tem nota fiscal
+    is_deleted = db.Column(db.Boolean, default=False)  # Soft-delete flag
+    deleted_at = db.Column(db.DateTime, nullable=True)  # Timestamp de exclusão
     
     def __repr__(self):
         return f'<Transaction {self.description} ({self.amount})>'

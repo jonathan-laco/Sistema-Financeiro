@@ -9,7 +9,8 @@ def get_monthly_totals(user_id, month, year):
     """
     transactions = Transaction.query.filter_by(
         user_id=user_id,
-        status='confirmado'
+        status='confirmado',
+        is_deleted=False
     ).filter(
         extract('month', Transaction.date) == month,
         extract('year', Transaction.date) == year
@@ -27,7 +28,8 @@ def get_expense_categories_data(user_id, month, year):
     transactions = Transaction.query.filter_by(
         user_id=user_id,
         status='confirmado',
-        type='despesa'
+        type='despesa',
+        is_deleted=False
     ).filter(
         extract('month', Transaction.date) == month,
         extract('year', Transaction.date) == year
@@ -65,7 +67,8 @@ def get_daily_data(user_id, month, year):
     # Obter transações do mês
     transactions = Transaction.query.filter_by(
         user_id=user_id,
-        status='confirmado'
+        status='confirmado',
+        is_deleted=False
     ).filter(
         extract('month', Transaction.date) == month,
         extract('year', Transaction.date) == year
@@ -92,7 +95,8 @@ def get_monthly_data(user_id, current_month, current_year, num_months=6):
         
         month_trans = Transaction.query.filter_by(
             user_id=user_id,
-            status='confirmado'
+            status='confirmado',
+            is_deleted=False
         ).filter(
             extract('month', Transaction.date) == month,
             extract('year', Transaction.date) == year

@@ -264,7 +264,7 @@ def delete_user(user_id):
     user.is_active = False
     db.session.commit()
 
-    return True, "Usuário marcado como excluído (soft-delete) com sucesso"
+    return True, "Usuário excluído com sucesso"
 
 def approve_user(user_id):
     """

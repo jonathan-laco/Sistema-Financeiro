@@ -53,7 +53,7 @@ def update_account(account_id, user_id, name):
 
 def delete_account(account_id, user_id):
     """
-    Exclui (soft-delete) uma conta bancária. Marca como deletada para fins de auditoria.
+    Exclui uma conta bancária.
     """
     account = get_account_by_id(account_id, user_id)
     if not account:
@@ -63,8 +63,7 @@ def delete_account(account_id, user_id):
     if account.balance != 0:
         return False, "Não é possível excluir uma conta com saldo"
     
-    # Marcar a conta como deletada (soft-delete) mesmo que existam transações,
-    # para preservar histórico e cumprir auditoria.
+    # Marcar a conta como deletada
     account.is_deleted = True
     account.deleted_at = datetime.utcnow()
     db.session.commit()

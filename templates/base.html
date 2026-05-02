@@ -471,6 +471,15 @@
                   <p>Metas</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a
+                  href="{{ url_for('telegram.index') }}"
+                  class="nav-link {% if request.path.startswith('/telegram') %}active{% endif %}"
+                >
+                  <i class="nav-icon fab fa-telegram-plane"></i>
+                  <p>Telegram</p>
+                </a>
+              </li>
               {% endif %}
 
               <li class="nav-item">
@@ -509,6 +518,15 @@
                 >
                   <i class="nav-icon fas fa-history"></i>
                   <p>Logs de Acesso</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  href="{{ url_for('telegram.admin_tokens') }}"
+                  class="nav-link {% if request.path.startswith('/telegram/admin') %}active{% endif %}"
+                >
+                  <i class="nav-icon fab fa-telegram-plane"></i>
+                  <p>Telegram</p>
                 </a>
               </li>
               {% endif %}

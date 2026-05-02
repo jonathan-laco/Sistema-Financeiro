@@ -25,6 +25,7 @@ from routes.reports import reports_bp
 from routes.settings import settings_bp
 from routes.admin import admin_bp
 from routes.goals import goals_bp
+from routes.telegram import telegram_bp
 
 def create_app(config_class=Config):
     # Inicialização da aplicação Flask
@@ -53,6 +54,7 @@ def create_app(config_class=Config):
     app.register_blueprint(settings_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(goals_bp)
+    app.register_blueprint(telegram_bp)
     
     # Configuração do carregador de usuário
     @login_manager.user_loader

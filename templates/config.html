@@ -177,6 +177,19 @@ block breadcrumb %}Configurações{% endblock %} {% block content %}
             transações.</small
           >
         </div>
+
+        <div class="form-group mb-0">
+          <label>Telegram</label>
+          <div>
+            <a href="{{ url_for('telegram.index') }}" class="btn btn-primary">
+              <i class="fab fa-telegram-plane"></i> Configurar Bot
+            </a>
+          </div>
+          <small class="form-text text-muted"
+            >Solicite o token, conecte o bot e registre transações pelo
+            Telegram.</small
+          >
+        </div>
       </div>
       <!-- /.card-body -->
     </div>

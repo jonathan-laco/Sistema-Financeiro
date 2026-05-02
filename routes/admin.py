@@ -191,6 +191,12 @@ def system_config():
     
     return render_template('admin/system_config.html', configs=configs)
 
+@admin_bp.route('/telegram')
+@login_required
+@admin_required
+def telegram_admin():
+    return redirect(url_for('telegram.admin_tokens'))
+
 @admin_bp.route('/users/<int:user_id>/delete', methods=['POST'])
 @login_required
 @admin_required

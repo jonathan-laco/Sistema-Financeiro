@@ -49,6 +49,7 @@ Este sistema foi projetado com **carinho e atenção aos detalhes**, para que vo
 - Configure o sistema: habilite ou desabilite cadastros MEI e permissões de registro.
 - Monitore logs de acesso para maior segurança.
 - Gere relatórios administrativos detalhados.
+- Gerencie solicitações de acesso ao bot do Telegram, aprovando, rejeitando, renovando ou desativando tokens de usuários.
 - **Realize backups do banco de dados diretamente no Discord(ADMIN)**, evitando perda de dados em problemas críticos. Para mais informações sobre como configurar webhooks no Discord, consulte a [documentação oficial de Webhooks do Discord](https://discord.com/developers/docs/resources/webhook).
 
 ### 🏦 Usuário Comum
@@ -71,6 +72,7 @@ Este sistema foi projetado com **carinho e atenção aos detalhes**, para que vo
 - **Modo Claro e Escuro**: Escolha o tema que mais combina com você.
 - **Filtros Avançados**: Filtre transações por conta, categoria, tipo e presença de nota fiscal.
 - **Gráficos Interativos**: Visualize dados financeiros com gráficos dinâmicos (requer internet para carregar via CDN).
+- **Integração com Telegram**: Registre receitas e despesas direto pelo bot, usando os comandos `/entrar`, `/sair` e `/cancelar`, com autenticação por token aprovado pelo administrador.
 
 ---
 
@@ -108,6 +110,10 @@ Este sistema foi projetado com **carinho e atenção aos detalhes**, para que vo
    - Comece a gerenciar suas contas, transações e metas.
 3. **Relatórios**:
    - Acesse relatórios mensais ou anuais e imprima ou exporte para Excel.
+4. **Telegram**:
+   - Em Configurações > Telegram, solicite acesso ao bot.
+   - Após a aprovação do administrador, copie o token gerado.
+   - No Telegram, use `/entrar`, cole o token e registre transações pelo menu guiado.
 
 ---
 
@@ -157,6 +163,16 @@ Siga os passos abaixo para configurar o **Sistema Financeiro Pessoal e MEI** no 
 4. **Banco de Dados**:
    - O projeto já vem configurado com o **SQLite** como banco de dados padrão.
    - O script `seed.py` será executado automaticamente na primeira inicialização para popular o banco com dados iniciais.
+
+5. **Configuração do Telegram (opcional)**:
+   - Crie um bot pelo [@BotFather](https://t.me/botfather).
+   - Copie o token gerado e adicione no arquivo `.env`:
+
+   ```env
+   TELEGRAM_BOT_TOKEN=SEU_TOKEN_DO_BOTFATHER
+   ```
+
+   - Ao iniciar o sistema com `python run.py`, o bot será iniciado automaticamente se essa variável estiver configurada.
 
 ---
 

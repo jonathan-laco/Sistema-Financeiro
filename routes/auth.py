@@ -12,6 +12,10 @@ def index():
         return redirect(url_for('dashboard.index'))
     return render_template('index.html')
 
+@auth_bp.route('/termos-de-uso')
+def terms():
+    return render_template('terms.html')
+
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -28,6 +32,11 @@ def register():
         email = request.form.get('email')
         password = request.form.get('password')
         full_name = request.form.get('full_name', '')
+        accepted_terms = request.form.get('terms') == 'agree'
+
+        if not accepted_terms:
+            flash('Você precisa aceitar os termos de uso para criar uma conta.', 'warning')
+            return redirect(url_for('auth.register'))
         
         # Verificar se o registro MEI está habilitado
         mei_registration_enabled = config_service.get_config('mei_registration_enabled', True)

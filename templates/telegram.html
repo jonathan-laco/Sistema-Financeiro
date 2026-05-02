@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Telegram{% endblock %}
+{% block breadcrumb %}Telegram{% endblock %}
+
+{% block extra_css %}
+<style>
+  .telegram-hero {
+    background: linear-gradient(135deg, #0f8ec7, #20c997);
+    color: #fff;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .telegram-token-box {
+    background: #f8f9fa;
+    border: 1px dashed #6c757d;
+    border-radius: 8px;
+    padding: 14px;
+    font-family: Consolas, Monaco, monospace;
+    word-break: break-all;
+  }
+
+  .dark-mode .telegram-token-box {
+    background: #343a40;
+    border-color: #6c757d;
+  }
+
+  .telegram-step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .telegram-step-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f7fb;
+    color: #0f8ec7;
+    flex: 0 0 36px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="telegram-hero">
+  <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+    <div>
+      <h2 class="mb-2"><i class="fab fa-telegram-plane mr-2"></i>Bot financeiro no Telegram</h2>
+      <p class="mb-0">Registre receitas e despesas sem abrir o navegador. Rápido, guiado e conectado à sua conta.</p>
+    </div>
+    <div class="mt-3 mt-md-0">
+      {% if telegram_token.request_status == 'approved' and telegram_token.is_valid %}
+      <span class="badge badge-light p-2"><i class="fas fa-check-circle text-success mr-1"></i>Aprovado</span>
+      {% elif telegram_token.request_status == 'pending' %}
+      <span class="badge badge-warning p-2"><i class="fas fa-clock mr-1"></i>Aguardando admin</span>
+      {% elif telegram_token.request_status == 'rejected' %}
+      <span class="badge badge-danger p-2"><i class="fas fa-times-circle mr-1"></i>Rejeitado</span>
+      {% elif telegram_token.request_status == 'disabled' %}
+      <span class="badge badge-secondary p-2"><i class="fas fa-ban mr-1"></i>Desativado</span>
+      {% else %}
+      <span class="badge badge-light p-2"><i class="fas fa-lock mr-1"></i>Não solicitado</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-7">
+    <div class="card card-info">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-key mr-2"></i>Seu acesso</h3>
+      </div>
+      <div class="card-body">
+        {% if telegram_token.request_status == 'approved' and telegram_token.is_valid %}
+          <p class="text-muted">Use este token no bot com o comando <strong>/entrar</strong>. Ele expira em {{ telegram_token.expires_at|format_local_datetime('%d/%m/%Y %H:%M') }}.</p>
+          <div class="telegram-token-box mb-3" id="telegramToken">{{ telegram_token.token }}</div>
+          <div class="d-flex flex-wrap">
+            <button type="button" class="btn btn-info mr-2 mb-2" id="copyTelegramToken">
+              <i class="fas fa-copy mr-1"></i> Copiar token
+            </button>
+            <form method="post" class="mr-2 mb-2">
+              <input type="hidden" name="action" value="renew">
+              <button type="submit" class="btn btn-outline-primary">
+                <i class="fas fa-sync-alt mr-1"></i> Renovar token
+              </button>
+            </form>
+            <form method="post" class="mb-2">
+              <input type="hidden" name="action" value="logout">
+              <button type="submit" class="btn btn-outline-secondary">
+                <i class="fas fa-sign-out-alt mr-1"></i> Desconectar Telegram
+              </button>
+            </form>
+          </div>
+          {% if telegram_token.is_connected %}
+          <div class="alert alert-success mt-3 mb-0">
+            <i class="fas fa-mobile-alt mr-1"></i> Telegram conectado{% if telegram_token.telegram_username %} como @{{ telegram_token.telegram_username }}{% endif %}.
+          </div>
+          {% else %}
+          <div class="alert alert-info mt-3 mb-0">
+            <i class="fas fa-info-circle mr-1"></i> Token aprovado, mas o Telegram ainda não foi conectado. Abra o bot e envie /entrar.
+          </div>
+          {% endif %}
+        {% elif telegram_token.request_status == 'pending' %}
+          <div class="alert alert-warning mb-0">
+            <i class="fas fa-hourglass-half mr-1"></i> Sua solicitação está aguardando aprovação do administrador.
+          </div>
+        {% else %}
+          <p class="text-muted">Solicite acesso ao bot. Após a aprovação do administrador, o token aparecerá nesta tela.</p>
+          <form method="post">
+            <input type="hidden" name="action" value="request_access">
+            <button type="submit" class="btn btn-info">
+              <i class="fas fa-paper-plane mr-1"></i> Solicitar acesso ao bot
+            </button>
+          </form>
+          {% if telegram_token.admin_note %}
+          <div class="alert alert-secondary mt-3 mb-0">
+            <strong>Observação do admin:</strong> {{ telegram_token.admin_note }}
+          </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-route mr-2"></i>Como entrar</h3>
+      </div>
+      <div class="card-body">
+        <div class="telegram-step">
+          <span class="telegram-step-icon"><i class="fas fa-user-check"></i></span>
+          <div><strong>1. Solicite acesso</strong><br><span class="text-muted">O admin aprova e define a validade do token.</span></div>
+        </div>
+        <div class="telegram-step">
+          <span class="telegram-step-icon"><i class="fas fa-robot"></i></span>
+          <div><strong>2. Abra o bot</strong><br><span class="text-muted">No Telegram, envie <code>/entrar</code> e cole o token.</span></div>
+        </div>
+        <div class="telegram-step mb-0">
+          <span class="telegram-step-icon"><i class="fas fa-plus-circle"></i></span>
+          <div><strong>3. Registre</strong><br><span class="text-muted">Escolha tipo, conta, categoria, valor e confirme.</span></div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="text-muted"><i class="fas fa-terminal mr-1"></i>Comandos: <code>/entrar</code>, <code>/sair</code>, <code>/cancelar</code></span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $(function () {
+    $('#copyTelegramToken').on('click', function () {
+      const token = $('#telegramToken').text().trim();
+      navigator.clipboard.writeText(token).then(() => {
+        $(this).removeClass('btn-info').addClass('btn-success').html('<i class="fas fa-check mr-1"></i> Copiado');
+      });
+    });
+  });
+</script>
+{% endblock %}

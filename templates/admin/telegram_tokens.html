@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Telegram{% endblock %}
+{% block breadcrumb %}Telegram Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+  .telegram-admin-card .small-box {
+    border-radius: 8px;
+  }
+
+  .token-preview {
+    max-width: 280px;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 0.85rem;
+    word-break: break-all;
+  }
+
+  .telegram-filter .btn {
+    margin: 0 6px 8px 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row telegram-admin-card">
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="small-box bg-warning">
+      <div class="inner"><h3>{{ stats.pending }}</h3><p>Pendentes</p></div>
+      <div class="icon"><i class="fas fa-hourglass-half"></i></div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="small-box bg-success">
+      <div class="inner"><h3>{{ stats.approved }}</h3><p>Aprovados</p></div>
+      <div class="icon"><i class="fas fa-check-circle"></i></div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="small-box bg-info">
+      <div class="inner"><h3>{{ stats.connected }}</h3><p>Conectados</p></div>
+      <div class="icon"><i class="fab fa-telegram-plane"></i></div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="small-box bg-danger">
+      <div class="inner"><h3>{{ stats.expired }}</h3><p>Expirados</p></div>
+      <div class="icon"><i class="fas fa-calendar-times"></i></div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title"><i class="fab fa-telegram-plane mr-2"></i>Gerenciar tokens do Telegram</h3>
+  </div>
+  <div class="card-body">
+    <div class="telegram-filter mb-3">
+      <a href="{{ url_for('telegram.admin_tokens') }}" class="btn btn-sm {{ 'btn-primary' if not active_status else 'btn-outline-primary' }}">Todos</a>
+      <a href="{{ url_for('telegram.admin_tokens', status='pending') }}" class="btn btn-sm {{ 'btn-warning' if active_status == 'pending' else 'btn-outline-warning' }}">Pendentes</a>
+      <a href="{{ url_for('telegram.admin_tokens', status='approved') }}" class="btn btn-sm {{ 'btn-success' if active_status == 'approved' else 'btn-outline-success' }}">Aprovados</a>
+      <a href="{{ url_for('telegram.admin_tokens', status='rejected') }}" class="btn btn-sm {{ 'btn-danger' if active_status == 'rejected' else 'btn-outline-danger' }}">Rejeitados</a>
+      <a href="{{ url_for('telegram.admin_tokens', status='disabled') }}" class="btn btn-sm {{ 'btn-secondary' if active_status == 'disabled' else 'btn-outline-secondary' }}">Desativados</a>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>Usuário</th>
+            <th>Status</th>
+            <th>Token</th>
+            <th>Validade</th>
+            <th>Telegram</th>
+            <th style="min-width: 260px;">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in tokens %}
+          <tr>
+            <td>
+              <strong>{{ item.user.full_name or item.user.username }}</strong><br>
+              <small class="text-muted">{{ item.user.email }}</small>
+            </td>
+            <td>
+              {% if item.request_status == 'pending' %}
+              <span class="badge badge-warning">Pendente</span>
+              {% elif item.request_status == 'approved' and item.is_valid %}
+              <span class="badge badge-success">Aprovado</span>
+              {% elif item.request_status == 'approved' %}
+              <span class="badge badge-danger">Expirado</span>
+              {% elif item.request_status == 'rejected' %}
+              <span class="badge badge-danger">Rejeitado</span>
+              {% elif item.request_status == 'disabled' %}
+              <span class="badge badge-secondary">Desativado</span>
+              {% else %}
+              <span class="badge badge-light">Nenhum</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if item.token %}
+              <div class="token-preview">{{ item.token }}</div>
+              {% else %}
+              <span class="text-muted">Ainda não gerado</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if item.expires_at %}
+              {{ item.expires_at|format_local_datetime('%d/%m/%Y %H:%M') }}<br>
+              <small class="text-muted">{{ item.expires_days }} dias</small>
+              {% else %}
+              <span class="text-muted">Sem validade</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if item.telegram_chat_id %}
+              <span class="badge badge-info">Conectado</span><br>
+              <small class="text-muted">{% if item.telegram_username %}@{{ item.telegram_username }}{% else %}Chat {{ item.telegram_chat_id }}{% endif %}</small>
+              {% else %}
+              <span class="text-muted">Não conectado</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if item.request_status == 'pending' %}
+              <form action="{{ url_for('telegram.approve', token_id=item.id) }}" method="post" class="d-inline-block mb-1">
+                <input type="hidden" name="expires_days" value="30">
+                <button type="submit" class="btn btn-sm btn-success">
+                  <i class="fas fa-check mr-1"></i>Aprovar 30 dias
+                </button>
+              </form>
+              <button class="btn btn-sm btn-outline-danger mb-1" data-toggle="modal" data-target="#rejectModal{{ item.id }}">
+                <i class="fas fa-times mr-1"></i>Rejeitar
+              </button>
+              {% endif %}
+
+              {% if item.request_status == 'approved' %}
+              <form action="{{ url_for('telegram.update_expiration', token_id=item.id) }}" method="post" class="form-inline mb-1">
+                <input type="number" name="expires_days" class="form-control form-control-sm mr-1" value="{{ item.expires_days }}" min="1" max="365" style="width: 86px;">
+                <button type="submit" class="btn btn-sm btn-outline-primary">Atualizar dias</button>
+              </form>
+              <form action="{{ url_for('telegram.disable', token_id=item.id) }}" method="post" class="d-inline-block">
+                <button type="submit" class="btn btn-sm btn-outline-secondary">
+                  <i class="fas fa-ban mr-1"></i>Desativar
+                </button>
+              </form>
+              {% endif %}
+
+              {% if item.request_status in ['rejected', 'disabled'] %}
+              <form action="{{ url_for('telegram.approve', token_id=item.id) }}" method="post" class="form-inline">
+                <input type="number" name="expires_days" class="form-control form-control-sm mr-1" value="30" min="1" max="365" style="width: 86px;">
+                <button type="submit" class="btn btn-sm btn-success">Reativar</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+
+          <div class="modal fade" id="rejectModal{{ item.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <form action="{{ url_for('telegram.reject', token_id=item.id) }}" method="post">
+                  <div class="modal-header bg-danger">
+                    <h5 class="modal-title">Rejeitar solicitação</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <label>Observação para registro</label>
+                    <textarea name="admin_note" class="form-control" rows="3" placeholder="Opcional"></textarea>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Rejeitar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">Nenhuma solicitação encontrada.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

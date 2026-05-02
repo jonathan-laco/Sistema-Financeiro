@@ -8,3 +8,4 @@ from services.report_service import *
 from services.user_service import *
 from services.invoice_service import *
 from services.goal_service import *
+from services.telegram_service import *

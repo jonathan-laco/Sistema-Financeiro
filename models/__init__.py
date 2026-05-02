@@ -5,3 +5,4 @@ from models.category import Category
 from models.transaction import Transaction
 from models.goal import Goal
 from models.invoice import Invoice
+from models.telegram_token import TelegramToken

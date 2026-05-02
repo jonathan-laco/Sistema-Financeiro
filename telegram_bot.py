@@ -318,7 +318,7 @@ def _run_bot(token, flask_app):
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
     logger.info('Bot Telegram iniciado.')
-    application.run_polling(drop_pending_updates=True, close_loop=False)
+    application.run_polling(drop_pending_updates=True, close_loop=False, stop_signals=None)
 
 
 def start_telegram_bot(flask_app):

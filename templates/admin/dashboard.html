@@ -271,6 +271,8 @@ block content %}
 </div>
 {% endblock %} {% block scripts %}
 <script>
+  var chartTheme = window.financeChartTheme;
+
   // Gráfico de Distribuição de Usuários
   var userDistributionCtx = document.getElementById('userDistributionChart').getContext('2d');
   var userDistributionChart = new Chart(userDistributionCtx, {
@@ -279,18 +281,14 @@ block content %}
       labels: ['Usuários Comuns', 'Administradores'],
       datasets: [{
         data: [{{ user_stats.total_users - user_stats.admin_users }}, {{ user_stats.admin_users }}],
-        backgroundColor: ['#17a2b8', '#dc3545']
+        backgroundColor: [chartTheme.colors.primary, chartTheme.colors.danger],
+        borderColor: '#fff',
+        borderWidth: 3,
+        hoverOffset: 8,
+        spacing: 3
       }]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'right',
-        }
-      }
-    }
+    options: chartTheme.doughnutOptions()
   });
 
   // Gráfico de Status dos Usuários
@@ -301,18 +299,14 @@ block content %}
       labels: ['Ativos', 'Inativos'],
       datasets: [{
         data: [{{ user_stats.active_users }}, {{ user_stats.inactive_users }}],
-        backgroundColor: ['#28a745', '#ffc107']
+        backgroundColor: [chartTheme.colors.success, '#f4b740'],
+        borderColor: '#fff',
+        borderWidth: 3,
+        hoverOffset: 8,
+        spacing: 3
       }]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'right',
-        }
-      }
-    }
+    options: chartTheme.doughnutOptions()
   });
 </script>
 {% endblock %}

@@ -529,6 +529,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Renderizar gráfico anual se estiver no modo anual
   {% if request.args.get('period') == 'year' %}
+  var chartTheme = window.financeChartTheme;
   var annualChartElement = document.getElementById('annualChart');
   if (annualChartElement) {
     var annualChartCtx = annualChartElement.getContext('2d');
@@ -539,45 +540,25 @@ document.addEventListener('DOMContentLoaded', function() {
         datasets: [
           {
             label: 'Receitas',
-            backgroundColor: 'rgba(40, 167, 69, 0.7)',
-            borderColor: '#28a745',
+            backgroundColor: chartTheme.alpha(chartTheme.colors.income, 0.82),
+            borderColor: chartTheme.colors.income,
             borderWidth: 1,
+            borderRadius: 6,
+            maxBarThickness: 42,
             data: [{% for month_data in annual_data %}{{ month_data.income }},{% endfor %}]
           },
           {
             label: 'Despesas',
-            backgroundColor: 'rgba(220, 53, 69, 0.7)',
-            borderColor: '#dc3545',
+            backgroundColor: chartTheme.alpha(chartTheme.colors.expense, 0.82),
+            borderColor: chartTheme.colors.expense,
             borderWidth: 1,
+            borderRadius: 6,
+            maxBarThickness: 42,
             data: [{% for month_data in annual_data %}{{ month_data.expense }},{% endfor %}]
           }
         ]
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: function(value) {
-                return 'R$ ' + value.toFixed(2);
-              }
-            }
-          }
-        },
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                var label = context.dataset.label || '';
-                var value = context.raw || 0;
-                return label + ': R$ ' + value.toFixed(2);
-              }
-            }
-          }
-        }
-      }
+      options: chartTheme.barOptions()
     });
   }
   {% endif %}

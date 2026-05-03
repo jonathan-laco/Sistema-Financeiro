@@ -172,7 +172,8 @@ Siga os passos abaixo para configurar o **Sistema Financeiro Pessoal e MEI** no 
    TELEGRAM_BOT_TOKEN=SEU_TOKEN_DO_BOTFATHER
    ```
 
-   - Ao iniciar o sistema com `python run.py`, o bot será iniciado automaticamente se essa variável estiver configurada.
+   - Em desenvolvimento, ao iniciar o sistema com `python run.py`, o bot será iniciado automaticamente se essa variável estiver configurada.
+   - Em produção com Waitress, Gunicorn ou outro servidor WSGI, rode o bot em um processo separado usando `bot_worker.py`.
 
 ---
 
@@ -213,6 +214,30 @@ E execute o sistema com:
 ```bash
 gunicorn -w 4 -b 0.0.0.0:8080 run:app
 ```
+
+### Bot do Telegram em Produção
+
+Quando o sistema web estiver rodando com Waitress, Gunicorn ou outro servidor WSGI, execute o bot do Telegram em um processo separado. Isso evita que o bot dependa do ciclo de vida dos workers do servidor web.
+
+Em um terminal/processo, rode a aplicação web:
+
+```bash
+gunicorn -w 4 -b 0.0.0.0:8080 run:app
+```
+
+Em outro terminal/processo, rode o worker do Telegram:
+
+```bash
+python bot_worker.py
+```
+
+No Windows com ambiente virtual, o comando pode ser:
+
+```bash
+.\venv\Scripts\python.exe bot_worker.py
+```
+
+Mantenha apenas uma instância do `bot_worker.py` em execução. Rodar mais de uma instância pode causar conflito no polling do Telegram ou respostas duplicadas.
 
 ---
 

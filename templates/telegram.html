@@ -159,11 +159,57 @@
 {% block scripts %}
 <script>
   $(function () {
-    $('#copyTelegramToken').on('click', function () {
-      const token = $('#telegramToken').text().trim();
-      navigator.clipboard.writeText(token).then(() => {
-        $(this).removeClass('btn-info').addClass('btn-success').html('<i class="fas fa-check mr-1"></i> Copiado');
+    function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+      }
+
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.top = '-9999px';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      return new Promise((resolve, reject) => {
+        try {
+          const copied = document.execCommand('copy');
+          document.body.removeChild(textarea);
+          copied ? resolve() : reject(new Error('copy command failed'));
+        } catch (error) {
+          document.body.removeChild(textarea);
+          reject(error);
+        }
       });
+    }
+
+    $('#copyTelegramToken').on('click', function () {
+      const button = $(this);
+      const token = $('#telegramToken').text().trim();
+
+      copyText(token)
+        .then(() => {
+          button
+            .removeClass('btn-info btn-danger')
+            .addClass('btn-success')
+            .html('<i class="fas fa-check mr-1"></i> Copiado');
+
+          setTimeout(() => {
+            button
+              .removeClass('btn-success btn-danger')
+              .addClass('btn-info')
+              .html('<i class="fas fa-copy mr-1"></i> Copiar token');
+          }, 2000);
+        })
+        .catch(() => {
+          button
+            .removeClass('btn-info btn-success')
+            .addClass('btn-danger')
+            .html('<i class="fas fa-times mr-1"></i> Não copiou');
+        });
     });
   });
 </script>

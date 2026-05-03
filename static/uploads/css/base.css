@@ -146,6 +146,25 @@
      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
  }
 
+ .card .chart {
+     position: relative;
+     background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 249, 251, 0.72));
+     border: 1px solid rgba(216, 231, 238, 0.72);
+     border-radius: var(--brand-radius);
+     padding: 14px;
+ }
+
+ .dark-mode .card .chart {
+     background:
+        linear-gradient(180deg, rgba(52, 58, 64, 0.84), rgba(31, 45, 53, 0.74));
+     border-color: rgba(255, 255, 255, 0.08);
+ }
+
+ .chart canvas {
+     display: block;
+ }
+
  .card-header {
      background: linear-gradient(135deg, rgba(15, 142, 199, 0.08), rgba(32, 201, 151, 0.08));
      border-bottom: 1px solid var(--brand-border);

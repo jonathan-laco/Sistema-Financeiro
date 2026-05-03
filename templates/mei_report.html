@@ -822,6 +822,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Renderizar gráfico anual, se necessário
   {% if request.args.get('period') == 'year' %}
+  const chartTheme = window.financeChartTheme;
   const annualChartCtx = document.getElementById('annualChart').getContext('2d');
   const annualChart = new Chart(annualChartCtx, {
     type: 'bar',
@@ -830,43 +831,25 @@ document.addEventListener('DOMContentLoaded', () => {
       datasets: [
         {
           label: 'Receitas',
-          backgroundColor: 'rgba(40, 167, 69, 0.7)',
-          borderColor: '#28a745',
+          backgroundColor: chartTheme.alpha(chartTheme.colors.income, 0.82),
+          borderColor: chartTheme.colors.income,
           borderWidth: 1,
+          borderRadius: 6,
+          maxBarThickness: 42,
           data: [{% for month_data in annual_data %}{{ month_data.income }},{% endfor %}]
         },
         {
           label: 'Despesas',
-          backgroundColor: 'rgba(220, 53, 69, 0.7)',
-          borderColor: '#dc3545',
+          backgroundColor: chartTheme.alpha(chartTheme.colors.expense, 0.82),
+          borderColor: chartTheme.colors.expense,
           borderWidth: 1,
+          borderRadius: 6,
+          maxBarThickness: 42,
           data: [{% for month_data in annual_data %}{{ month_data.expense }},{% endfor %}]
         }
       ]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: value => `R$ ${value.toFixed(2)}`
-          }
-        }
-      },
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: context => {
-              const label = context.dataset.label || '';
-              const value = context.raw || 0;
-              return `${label}: R$ ${value.toFixed(2)}`;
-            }
-          }
-        }
-      }
-    }
+    options: chartTheme.barOptions()
   });
   {% endif %}
 });

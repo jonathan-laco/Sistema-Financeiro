@@ -10,6 +10,18 @@ endblock %} {% block extra_css %}
   .card-draggable {
     margin-bottom: 20px;
   }
+
+  .pending-transactions-scroll {
+    max-height: 360px;
+    overflow-y: auto;
+  }
+
+  .pending-transactions-scroll thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--card-bg, #fff);
+  }
 </style>
 {% endblock %} {% block content %}
 <!-- Info boxes -->
@@ -226,7 +238,7 @@ endblock %} {% block extra_css %}
           </div>
         </div>
         <div class="card-body p-0">
-          <div class="table-responsive">
+          <div class="table-responsive pending-transactions-scroll">
             <table class="table table-striped">
               <thead>
                 <tr>

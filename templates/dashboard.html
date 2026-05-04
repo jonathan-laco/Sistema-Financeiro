@@ -20,7 +20,14 @@ endblock %} {% block extra_css %}
     position: sticky;
     top: 0;
     z-index: 1;
-    background: var(--card-bg, #fff);
+    background: #fff;
+    color: var(--brand-ink);
+  }
+
+  .dark-mode .pending-transactions-scroll thead th {
+    background: #2f3a42;
+    color: #eef8fb;
+    border-bottom-color: rgba(255, 255, 255, 0.16);
   }
 </style>
 {% endblock %} {% block content %}

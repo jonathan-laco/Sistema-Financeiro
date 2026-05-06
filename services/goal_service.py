@@ -24,8 +24,10 @@ def create_goal(user_id, title, description, target_amount, current_amount=0, ta
     """
     Cria uma nova meta
     """
-    # Converter string para datetime se necessário
-    if isinstance(target_date, str) and target_date:
+    # Normalizar data vazia e converter string para datetime quando necessário
+    if not target_date:
+        target_date = None
+    elif isinstance(target_date, str):
         target_date = datetime.strptime(target_date, '%Y-%m-%d')
     
     new_goal = Goal(
@@ -70,8 +72,10 @@ def update_goal(goal_id, user_id, title=None, description=None, target_amount=No
             goal.status = 'completed'
     
     if target_date is not None:
-        # Converter string para datetime se necessário
-        if isinstance(target_date, str) and target_date:
+        # Normalizar data vazia e converter string para datetime quando necessário
+        if not target_date:
+            target_date = None
+        elif isinstance(target_date, str):
             target_date = datetime.strptime(target_date, '%Y-%m-%d')
         goal.target_date = target_date
     

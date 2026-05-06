@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from services import goal_service
 from datetime import datetime
+from utils.number_helpers import parse_brl_number
 
 goals_bp = Blueprint('goals', __name__, url_prefix='/goals')
 
@@ -39,12 +40,38 @@ def add():
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
-        target_amount = float(request.form.get('target_amount'))
-        current_amount = float(request.form.get('current_amount', 0))
+        # Validar e parsear valores numéricos
+        try:
+            target_amount = parse_brl_number(request.form.get('target_amount'))
+        except ValueError:
+            flash('Valor Alvo inválido. Informe um número válido.', 'danger')
+            return render_template('goals/add.html', title=title, description=description,
+                                   target_amount=request.form.get('target_amount'),
+                                   current_amount=request.form.get('current_amount'),
+                                   category=request.form.get('category'),
+                                   color=request.form.get('color', '#3498db'))
+
+        try:
+            current_amount = parse_brl_number(request.form.get('current_amount'), 0)
+        except ValueError:
+            flash('Valor Atual inválido. Informe um número válido.', 'danger')
+            return render_template('goals/add.html', title=title, description=description,
+                                   target_amount=request.form.get('target_amount'),
+                                   current_amount=request.form.get('current_amount'),
+                                   category=request.form.get('category'),
+                                   color=request.form.get('color', '#3498db'))
+
         target_date = request.form.get('target_date')
         category = request.form.get('category')
         color = request.form.get('color', '#3498db')
-        
+
+        if not target_date:
+            flash('Informe a data limite da meta.', 'danger')
+            return render_template('goals/add.html', title=title, description=description,
+                                   target_amount=request.form.get('target_amount'),
+                                   current_amount=request.form.get('current_amount'),
+                                   category=category, color=color)
+
         goal = goal_service.create_goal(
             user_id=current_user.id,
             title=title,
@@ -73,12 +100,25 @@ def edit(goal_id):
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
-        target_amount = float(request.form.get('target_amount'))
-        current_amount = float(request.form.get('current_amount', 0))
+        try:
+            target_amount = parse_brl_number(request.form.get('target_amount'))
+        except ValueError:
+            flash('Valor Alvo inválido. Informe um número válido.', 'danger')
+            return render_template('goals/edit.html', goal=goal)
+
+        try:
+            current_amount = parse_brl_number(request.form.get('current_amount'), 0)
+        except ValueError:
+            flash('Valor Atual inválido. Informe um número válido.', 'danger')
+            return render_template('goals/edit.html', goal=goal)
         target_date = request.form.get('target_date')
         category = request.form.get('category')
         color = request.form.get('color')
         status = request.form.get('status')
+
+        if not target_date:
+            flash('Informe a data limite da meta.', 'danger')
+            return render_template('goals/edit.html', goal=goal)
         
         goal, message = goal_service.update_goal(
             goal_id=goal_id,
@@ -113,7 +153,7 @@ def delete(goal_id):
 @goals_bp.route('/add_amount/<int:goal_id>', methods=['POST'])
 @login_required
 def add_amount(goal_id):
-    amount = float(request.form.get('amount', 0))
+    amount = parse_brl_number(request.form.get('amount'), 0)
     
     if amount <= 0:
         flash('O valor deve ser maior que zero!', 'danger')

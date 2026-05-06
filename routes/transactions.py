@@ -5,6 +5,7 @@ from datetime import datetime
 import os
 from flask import current_app
 from utils.date_helpers import get_now_sp, format_date
+from utils.number_helpers import parse_brl_number
 
 transactions_bp = Blueprint('transactions', __name__, url_prefix='/transactions')
 
@@ -83,7 +84,7 @@ def add():
     if request.method == 'POST':
         account_id = request.form.get('account_id', type=int)
         transaction_type = request.form.get('type')
-        amount = float(request.form.get('amount'))
+        amount = parse_brl_number(request.form.get('amount'))
         description = request.form.get('description')
         category_id = request.form.get('category_id', type=int)
         is_confirmed = 'is_confirmed' in request.form
@@ -185,7 +186,7 @@ def edit(transaction_id):
         try:
             account_id = request.form.get('account_id', type=int)
             transaction_type = request.form.get('type')
-            amount = float(request.form.get('amount'))
+            amount = parse_brl_number(request.form.get('amount'))
             description = request.form.get('description')
             category_id = request.form.get('category_id', type=int)
             is_confirmed = 'is_confirmed' in request.form

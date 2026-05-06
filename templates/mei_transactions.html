@@ -139,7 +139,7 @@
                   <span class="badge bg-danger">Despesa</span>
                   {% endif %}
                 </td>
-                <td>R$ {{ "%.2f"|format(transaction.amount) }}</td>
+                <td>{{ transaction.amount|format_brl }}</td>
                 <td>
                   {% if transaction.status == 'confirmado' %}
                   <span class="badge bg-success">Confirmado</span>
@@ -196,7 +196,7 @@
               <div class="modal-body">
                 <p>Tem certeza que deseja excluir esta transação?</p>
                 <p><strong>Descrição:</strong> {{ transaction.description }}</p>
-                <p><strong>Valor:</strong> R$ {{ "%.2f"|format(transaction.amount) }}</p>
+                <p><strong>Valor:</strong> {{ transaction.amount|format_brl }}</p>
                 <p><strong>Data:</strong> {{ transaction.date.strftime('%d/%m/%Y') }}</p>
                 
                 {% if transaction.status == 'confirmado' %}

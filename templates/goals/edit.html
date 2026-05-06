@@ -33,7 +33,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text">R$</span>
             </div>
-            <input type="number" class="form-control" id="target_amount" name="target_amount" step="0.01" min="0" value="{{ goal.target_amount }}" required>
+            <input type="text" class="form-control" id="target_amount" name="target_amount" inputmode="decimal" value="{{ goal.target_amount|format_brl_input }}" required>
           </div>
         </div>
         
@@ -43,13 +43,13 @@
             <div class="input-group-prepend">
               <span class="input-group-text">R$</span>
             </div>
-            <input type="number" class="form-control" id="current_amount" name="current_amount" step="0.01" min="0" value="{{ goal.current_amount }}">
+            <input type="text" class="form-control" id="current_amount" name="current_amount" inputmode="decimal" value="{{ goal.current_amount|format_brl_input }}">
           </div>
         </div>
         
         <div class="form-group">
-          <label for="target_date">Data Limite</label>
-          <input type="date" class="form-control" id="target_date" name="target_date" value="{{ goal.target_date.strftime('%Y-%m-%d') if goal.target_date else '' }}">
+          <label for="target_date">Data Limite *</label>
+          <input type="date" class="form-control" id="target_date" name="target_date" value="{{ goal.target_date.strftime('%Y-%m-%d') if goal.target_date else '' }}" required>
         </div>
         
         <div class="form-group">
@@ -93,7 +93,7 @@
         <p>Atualize sua meta conforme seu progresso:</p>
         <ul>
           <li>Ajuste o valor atual conforme você economiza</li>
-          <li>Altere a data limite se necessário</li>
+          <li>Altere a data limite quando precisar</li>
           <li>Atualize o status para refletir seu progresso</li>
         </ul>
       </div>
@@ -111,11 +111,18 @@
       
       <div class="callout callout-success">
         <h5>Progresso Atual</h5>
+        {% set balance = goal.target_amount - goal.current_amount %}
         <div class="progress">
           <div class="progress-bar" role="progressbar" style="width: {{ goal.progress_percentage }}%; background-color: {{ goal.color }};" aria-valuenow="{{ goal.progress_percentage }}" aria-valuemin="0" aria-valuemax="100">{{ "%.1f"|format(goal.progress_percentage) }}%</div>
         </div>
-        <p class="mt-2">Valor acumulado: R$ {{ "%.2f"|format(goal.current_amount) }} de R$ {{ "%.2f"|format(goal.target_amount) }}</p>
-        <p>Faltam: R$ {{ "%.2f"|format(goal.target_amount - goal.current_amount) }}</p>
+        <p class="mt-2">Valor acumulado: {{ goal.current_amount|format_brl }} de {{ goal.target_amount|format_brl }}</p>
+        {% if balance > 0 %}
+          <p>Faltam: {{ balance|format_brl }}</p>
+        {% elif balance < 0 %}
+          <p>Sobrou: {{ (-balance)|format_brl }}</p>
+        {% else %}
+          <p>Meta alcançada exatamente.</p>
+        {% endif %}
       </div>
     </div>
     <!-- /.card-body -->

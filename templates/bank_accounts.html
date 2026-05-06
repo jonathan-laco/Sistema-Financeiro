@@ -67,7 +67,7 @@
             <tr>
               <td>{{ account.id }}</td>
               <td>{{ account.name }}</td>
-              <td>R$ {{ "%.2f"|format(account.balance) }}</td>
+              <td>{{ account.balance|format_brl }}</td>
               <td>
                 <div class="btn-group">
                   <a href="{{ url_for('transactions.index', account=account.id) }}" class="btn btn-info btn-sm">

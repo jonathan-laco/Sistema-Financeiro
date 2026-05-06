@@ -24,7 +24,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text">R$</span>
             </div>
-            <input type="text" class="form-control" id="balance" value="{{ "%.2f"|format(account.balance) }}" disabled>
+            <input type="text" class="form-control" id="balance" value="{{ account.balance|format_brl_input }}" disabled>
           </div>
           <small class="form-text text-muted">O saldo é atualizado automaticamente com base nas transações confirmadas.</small>
         </div>

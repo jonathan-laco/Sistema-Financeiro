@@ -19,12 +19,12 @@
       <div class="card-body">
         <div class="form-group">
           <label for="title">Título *</label>
-          <input type="text" class="form-control" id="title" name="title" required>
+          <input type="text" class="form-control" id="title" name="title" required value="{{ title or '' }}">
         </div>
         
         <div class="form-group">
           <label for="description">Descrição</label>
-          <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+          <textarea class="form-control" id="description" name="description" rows="3">{{ description or '' }}</textarea>
         </div>
         
         <div class="form-group">
@@ -33,7 +33,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text">R$</span>
             </div>
-            <input type="number" class="form-control" id="target_amount" name="target_amount" step="0.01" min="0" required>
+            <input type="text" class="form-control" id="target_amount" name="target_amount" inputmode="decimal" placeholder="0,00" required value="{{ target_amount or '' }}">
           </div>
         </div>
         
@@ -43,23 +43,23 @@
             <div class="input-group-prepend">
               <span class="input-group-text">R$</span>
             </div>
-            <input type="number" class="form-control" id="current_amount" name="current_amount" step="0.01" min="0" value="0">
+            <input type="text" class="form-control" id="current_amount" name="current_amount" inputmode="decimal" placeholder="0,00" value="{{ current_amount or '0,00' }}">
           </div>
         </div>
         
         <div class="form-group">
-          <label for="target_date">Data Limite</label>
-          <input type="date" class="form-control" id="target_date" name="target_date">
+          <label for="target_date">Data Limite *</label>
+          <input type="date" class="form-control" id="target_date" name="target_date" required>
         </div>
         
         <div class="form-group">
           <label for="category">Categoria</label>
-          <input type="text" class="form-control" id="category" name="category" placeholder="Ex: Casa, Carro, Viagem, Educação">
+          <input type="text" class="form-control" id="category" name="category" placeholder="Ex: Casa, Carro, Viagem, Educação" value="{{ category or '' }}">
         </div>
         
         <div class="form-group">
           <label for="color">Cor</label>
-          <input type="color" class="form-control" id="color" name="color" value="#3498db">
+          <input type="color" class="form-control" id="color" name="color" value="{{ color or '#3498db' }}">
         </div>
       </div>
       <!-- /.card-body -->
@@ -84,7 +84,7 @@
         <p>Crie e acompanhe suas metas financeiras para atingir seus objetivos:</p>
         <ul>
           <li>Estabeleça um valor alvo para sua meta</li>
-          <li>Defina uma data limite opcional</li>
+          <li>Defina uma data limite obrigatória</li>
           <li>Acompanhe seu progresso em direção à meta</li>
           <li>Categorize suas metas para melhor organização</li>
         </ul>

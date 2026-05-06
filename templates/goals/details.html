@@ -21,11 +21,18 @@
       <div class="card-body">
         <div class="text-center mb-4">
           <h2>Progresso</h2>
+          {% set balance = goal.target_amount - goal.current_amount %}
           <div class="progress" style="height: 30px;">
             <div class="progress-bar" role="progressbar" style="width: {{ goal.progress_percentage }}%; background-color: {{ goal.color }};" aria-valuenow="{{ goal.progress_percentage }}" aria-valuemin="0" aria-valuemax="100">{{ "%.1f"|format(goal.progress_percentage) }}%</div>
           </div>
-          <h3 class="mt-3">R$ {{ "%.2f"|format(goal.current_amount) }} / R$ {{ "%.2f"|format(goal.target_amount) }}</h3>
-          <p>Faltam: R$ {{ "%.2f"|format(goal.target_amount - goal.current_amount) }}</p>
+          <h3 class="mt-3">{{ goal.current_amount|format_brl }} / {{ goal.target_amount|format_brl }}</h3>
+          {% if balance > 0 %}
+            <p>Faltam: {{ balance|format_brl }}</p>
+          {% elif balance < 0 %}
+            <p>Sobrou: {{ (-balance)|format_brl }}</p>
+          {% else %}
+            <p>Meta alcançada exatamente.</p>
+          {% endif %}
         </div>
         
         <div class="row">
@@ -133,7 +140,7 @@
                         <div class="input-group-prepend">
                           <span class="input-group-text">R$</span>
                         </div>
-                        <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0.01" required>
+                        <input type="text" class="form-control" id="amount" name="amount" inputmode="decimal" placeholder="0,00" required>
                       </div>
                     </div>
                   </div>

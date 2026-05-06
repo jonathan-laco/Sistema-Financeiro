@@ -36,7 +36,7 @@ endblock %} {% block extra_css %}
   <div class="col-12 col-sm-6 col-md-3">
     <div class="small-box bg-info">
       <div class="inner">
-        <h3>R$ {{ "%.2f"|format(total_balance) }}</h3>
+        <h3>{{ total_balance|format_brl }}</h3>
         <p>
           {% if current_user.is_mei %}Saldo Total MEI{% else %}Saldo Total{%
           endif %}
@@ -50,7 +50,7 @@ endblock %} {% block extra_css %}
   <div class="col-12 col-sm-6 col-md-3">
     <div class="small-box bg-success">
       <div class="inner">
-        <h3>R$ {{ "%.2f"|format(total_income) }}</h3>
+        <h3>{{ total_income|format_brl }}</h3>
         <p>
           {% if current_user.is_mei %}Receitas MEI (Mês){% else %}Receitas
           (Mês){% endif %}
@@ -67,7 +67,7 @@ endblock %} {% block extra_css %}
   <div class="col-12 col-sm-6 col-md-3">
     <div class="small-box bg-danger">
       <div class="inner">
-        <h3>R$ {{ "%.2f"|format(total_expense) }}</h3>
+        <h3>{{ total_expense|format_brl }}</h3>
         <p>
           {% if current_user.is_mei %}Despesas MEI (Mês){% else %}Despesas
           (Mês){% endif %}
@@ -81,7 +81,7 @@ endblock %} {% block extra_css %}
   <div class="col-12 col-sm-6 col-md-3">
     <div class="small-box bg-warning">
       <div class="inner">
-        <h3>R$ {{ "%.2f"|format(total_income - total_expense) }}</h3>
+        <h3>{{ (total_income - total_expense)|format_brl }}</h3>
         <p>
           {% if current_user.is_mei %}Saldo MEI do Mês{% else %}Saldo do Mês{%
           endif %}
@@ -202,7 +202,7 @@ endblock %} {% block extra_css %}
                   <span
                     class="badge badge-{{ 'success' if account.balance >= 0 else 'danger' }} float-right"
                   >
-                    R$ {{ "%.2f"|format(account.balance) }}
+                    {{ account.balance|format_brl }}
                   </span>
                 </a>
               </div>
@@ -280,7 +280,7 @@ endblock %} {% block extra_css %}
                     <span class="badge bg-danger">Despesa</span>
                     {% endif %}
                   </td>
-                  <td>R$ {{ "%.2f"|format(transaction.amount) }}</td>
+                  <td>{{ transaction.amount|format_brl }}</td>
                   <td>
                     <div class="btn-group">
                       <a
@@ -385,7 +385,7 @@ endblock %} {% block extra_css %}
                     <span class="badge bg-danger">Despesa</span>
                     {% endif %}
                   </td>
-                  <td>R$ {{ "%.2f"|format(transaction.amount) }}</td>
+                  <td>{{ transaction.amount|format_brl }}</td>
                   <td>
                     {% if transaction.status == 'confirmado' %}
                     <span class="badge bg-success">Confirmado</span>

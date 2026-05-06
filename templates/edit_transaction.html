@@ -3,6 +3,66 @@
 {% block page_title %}Editar Transação{% endblock %}
 {% block breadcrumb %}Editar Transação{% endblock %}
 
+{% block extra_css %}
+<style>
+  .transaction-type-toggle {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.4rem;
+  }
+
+  .transaction-type-option {
+    position: relative;
+  }
+
+  .transaction-type-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .transaction-type-option label {
+    align-items: center;
+    border: 1px solid #ced4da;
+    border-radius: 0.35rem;
+    color: #495057;
+    cursor: pointer;
+    display: flex;
+    font-weight: 700;
+    gap: 0.45rem;
+    justify-content: center;
+    margin: 0;
+    min-height: 42px;
+    padding: 0.55rem 0.75rem;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    width: 100%;
+  }
+
+  .transaction-type-option input:focus + label {
+    box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+  }
+
+  .transaction-type-option input[value="receita"]:checked + label {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: #fff;
+  }
+
+  .transaction-type-option input[value="despesa"]:checked + label {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+  }
+
+  @media (max-width: 360px) {
+    .transaction-type-toggle {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row">
 <div class="col-md-6">
@@ -16,13 +76,21 @@
     <div class="card-body">
       <div class="form-group">
         <label>Tipo de Transação</label>
-        <div class="custom-control custom-radio">
-          <input class="custom-control-input" type="radio" id="type_income" name="type" value="receita" {% if transaction.type == 'receita' %}checked{% endif %}>
-          <label for="type_income" class="custom-control-label">Receita</label>
-        </div>
-        <div class="custom-control custom-radio">
-          <input class="custom-control-input" type="radio" id="type_expense" name="type" value="despesa" {% if transaction.type == 'despesa' %}checked{% endif %}>
-          <label for="type_expense" class="custom-control-label">Despesa</label>
+        <div class="transaction-type-toggle" role="radiogroup" aria-label="Tipo de Transação">
+          <div class="transaction-type-option">
+            <input type="radio" id="type_income" name="type" value="receita" {% if transaction.type == 'receita' %}checked{% endif %}>
+            <label for="type_income">
+              <i class="fas fa-arrow-up"></i>
+              Receita
+            </label>
+          </div>
+          <div class="transaction-type-option">
+            <input type="radio" id="type_expense" name="type" value="despesa" {% if transaction.type == 'despesa' %}checked{% endif %}>
+            <label for="type_expense">
+              <i class="fas fa-arrow-down"></i>
+              Despesa
+            </label>
+          </div>
         </div>
       </div>
       

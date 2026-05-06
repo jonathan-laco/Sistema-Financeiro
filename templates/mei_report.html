@@ -227,7 +227,7 @@
   <div class="col-md-3">
     <div class="small-box bg-success">
       <div class="inner">
-        <h3>R$ {{ "%.2f"|format(total_income) }}</h3>
+        <h3>{{ total_income|format_brl }}</h3>
         <p>Total de Receitas</p>
       </div>
       <div class="icon">
@@ -238,7 +238,7 @@
   <div class="col-md-3">
     <div class="small-box bg-danger">
       <div class="inner">
-        <h3>R$ {{ "%.2f"|format(total_expense) }}</h3>
+        <h3>{{ total_expense|format_brl }}</h3>
         <p>Total de Despesas</p>
       </div>
       <div class="icon">
@@ -249,7 +249,7 @@
   <div class="col-md-3">
     <div class="small-box bg-info">
       <div class="inner">
-        <h3>R$ {{ "%.2f"|format(total_income - total_expense) }}</h3>
+        <h3>{{ (total_income - total_expense)|format_brl }}</h3>
         <p>Saldo do Período</p>
       </div>
       <div class="icon">
@@ -276,7 +276,7 @@
   <div class="col-md-12">
     <div class="alert alert-danger" style="animation: blink 1s infinite;">
       <h5><i class="icon fas fa-exclamation-triangle"></i> Atenção! Limite de faturamento MEI excedido!</h5>
-      <p>Seu faturamento anual de <strong>R$ {{ "%.2f"|format(annual_income) }}</strong> ultrapassou o limite de R$ 81.000,00 para MEI.</p>
+      <p>Seu faturamento anual de <strong>{{ annual_income|format_brl }}</strong> ultrapassou o limite de R$ 81.000,00 para MEI.</p>
       <p>Considere consultar um contador imediatamente para regularizar sua situação.</p>
     </div>
   </div>
@@ -286,7 +286,7 @@
   <div class="col-md-12">
     <div class="alert alert-danger">
       <h5><i class="icon fas fa-exclamation-triangle"></i> Atenção! Limite de faturamento MEI próximo do limite!</h5>
-      <p>Seu faturamento anual de <strong>R$ {{ "%.2f"|format(annual_income) }}</strong> está próximo ou ultrapassou o limite de R$ 81.000,00 para MEI.</p>
+      <p>Seu faturamento anual de <strong>{{ annual_income|format_brl }}</strong> está próximo ou ultrapassou o limite de R$ 81.000,00 para MEI.</p>
       <p>Considere consultar um contador para avaliar a necessidade de mudança de regime tributário.</p>
     </div>
   </div>
@@ -296,7 +296,7 @@
   <div class="col-md-12">
     <div class="alert alert-warning">
       <h5><i class="icon fas fa-exclamation-triangle"></i> Atenção! Faturamento MEI se aproximando do limite!</h5>
-      <p>Seu faturamento anual de <strong>R$ {{ "%.2f"|format(annual_income) }}</strong> está se aproximando do limite de R$ 81.000,00 para MEI.</p>
+      <p>Seu faturamento anual de <strong>{{ annual_income|format_brl }}</strong> está se aproximando do limite de R$ 81.000,00 para MEI.</p>
       <p>Monitore suas receitas com atenção nos próximos meses.</p>
     </div>
   </div>
@@ -333,19 +333,19 @@
               {% for month_data in annual_data %}
               <tr>
                 <td>{{ month_data.month_name }}</td>
-                <td class="text-success">R$ {{ "%.2f"|format(month_data.income) }}</td>
-                <td class="text-danger">R$ {{ "%.2f"|format(month_data.expense) }}</td>
+                <td class="text-success">{{ month_data.income|format_brl }}</td>
+                <td class="text-danger">{{ month_data.expense|format_brl }}</td>
                 <td class="{% if month_data.income - month_data.expense >= 0 %}text-success{% else %}text-danger{% endif %}">
-                  R$ {{ "%.2f"|format(month_data.income - month_data.expense) }}
+                  {{ (month_data.income - month_data.expense)|format_brl }}
                 </td>
               </tr>
               {% endfor %}
               <tr class="table-active font-weight-bold">
                 <td>Total Anual</td>
-                <td class="text-success">R$ {{ "%.2f"|format(annual_income) }}</td>
-                <td class="text-danger">R$ {{ "%.2f"|format(annual_expense) }}</td>
+                <td class="text-success">{{ annual_income|format_brl }}</td>
+                <td class="text-danger">{{ annual_expense|format_brl }}</td>
                 <td class="{% if annual_income - annual_expense >= 0 %}text-success{% else %}text-danger{% endif %}">
-                  R$ {{ "%.2f"|format(annual_income - annual_expense) }}
+                  {{ (annual_income - annual_expense)|format_brl }}
                 </td>
               </tr>
             </tbody>
@@ -411,7 +411,7 @@
                 <span class="badge bg-danger">Despesa</span>
                 {% endif %}
               </td>
-              <td>R$ {{ "%.2f"|format(transaction.amount) }}</td>
+              <td>{{ transaction.amount|format_brl }}</td>
               <td>
                 {% if transaction.has_invoice %}
                 <span class="badge bg-info">
@@ -508,7 +508,7 @@
                 <span class="badge bg-danger">Despesa</span>
                 {% endif %}
               </td>
-              <td>R$ {{ "%.2f"|format(transaction.amount) }}</td>
+              <td>{{ transaction.amount|format_brl }}</td>
               <td>
                 {% if transaction.has_invoice %}
                 <span class="badge bg-info">
@@ -604,6 +604,11 @@
 
 {% block scripts %}
 <script>
+const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL'
+}).format(value || 0);
+
 // Função para exportar para Excel
 function exportToExcel() {
   // Determinar qual tabela exportar com base no período
@@ -709,7 +714,7 @@ function printReport() {
   income.style.backgroundColor = '#d4edda';
   income.style.borderRadius = '5px';
   income.style.marginRight = '10px';
-  income.innerHTML = `<strong>Total de Receitas:</strong> R$ ${totalIncome.toFixed(2)}`;
+  income.innerHTML = `<strong>Total de Receitas:</strong> ${formatCurrency(totalIncome)}`;
   summary.appendChild(income);
 
   const expense = document.createElement('div');
@@ -718,7 +723,7 @@ function printReport() {
   expense.style.backgroundColor = '#f8d7da';
   expense.style.borderRadius = '5px';
   expense.style.marginRight = '10px';
-  expense.innerHTML = `<strong>Total de Despesas:</strong> R$ ${totalExpense.toFixed(2)}`;
+  expense.innerHTML = `<strong>Total de Despesas:</strong> ${formatCurrency(totalExpense)}`;
   summary.appendChild(expense);
 
   const balanceDiv = document.createElement('div');
@@ -726,7 +731,7 @@ function printReport() {
   balanceDiv.style.padding = '10px';
   balanceDiv.style.backgroundColor = '#d1ecf1';
   balanceDiv.style.borderRadius = '5px';
-  balanceDiv.innerHTML = `<strong>Saldo do Período:</strong> R$ ${balance.toFixed(2)}`;
+  balanceDiv.innerHTML = `<strong>Saldo do Período:</strong> ${formatCurrency(balance)}`;
   summary.appendChild(balanceDiv);
 
   printContent.appendChild(summary);

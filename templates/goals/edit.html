@@ -33,7 +33,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text">R$</span>
             </div>
-            <input type="number" class="form-control" id="target_amount" name="target_amount" step="0.01" min="0" value="{{ goal.target_amount }}" required>
+            <input type="text" class="form-control" id="target_amount" name="target_amount" inputmode="decimal" value="{{ goal.target_amount|format_brl_input }}" required>
           </div>
         </div>
         
@@ -43,7 +43,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text">R$</span>
             </div>
-            <input type="number" class="form-control" id="current_amount" name="current_amount" step="0.01" min="0" value="{{ goal.current_amount }}">
+            <input type="text" class="form-control" id="current_amount" name="current_amount" inputmode="decimal" value="{{ goal.current_amount|format_brl_input }}">
           </div>
         </div>
         
@@ -114,8 +114,8 @@
         <div class="progress">
           <div class="progress-bar" role="progressbar" style="width: {{ goal.progress_percentage }}%; background-color: {{ goal.color }};" aria-valuenow="{{ goal.progress_percentage }}" aria-valuemin="0" aria-valuemax="100">{{ "%.1f"|format(goal.progress_percentage) }}%</div>
         </div>
-        <p class="mt-2">Valor acumulado: R$ {{ "%.2f"|format(goal.current_amount) }} de R$ {{ "%.2f"|format(goal.target_amount) }}</p>
-        <p>Faltam: R$ {{ "%.2f"|format(goal.target_amount - goal.current_amount) }}</p>
+        <p class="mt-2">Valor acumulado: {{ goal.current_amount|format_brl }} de {{ goal.target_amount|format_brl }}</p>
+        <p>Faltam: {{ (goal.target_amount - goal.current_amount)|format_brl }}</p>
       </div>
     </div>
     <!-- /.card-body -->

@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from services import account_service
+from utils.number_helpers import parse_brl_number
 
 accounts_bp = Blueprint('accounts', __name__, url_prefix='/accounts')
 
@@ -20,7 +21,7 @@ def index():
 def add():
     if request.method == 'POST':
         name = request.form.get('name')
-        initial_balance = float(request.form.get('balance') or 0)
+        initial_balance = parse_brl_number(request.form.get('balance'), 0)
         
         account_service.create_account(current_user.id, name, initial_balance)
         

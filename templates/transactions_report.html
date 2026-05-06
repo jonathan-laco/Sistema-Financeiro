@@ -190,7 +190,7 @@
 <div class="col-md-3">
   <div class="small-box bg-success">
     <div class="inner">
-      <h3>R$ {{ "%.2f"|format(total_income) }}</h3>
+      <h3>{{ total_income|format_brl }}</h3>
       <p>Total de Receitas</p>
     </div>
     <div class="icon">
@@ -201,7 +201,7 @@
 <div class="col-md-3">
   <div class="small-box bg-danger">
     <div class="inner">
-      <h3>R$ {{ "%.2f"|format(total_expense) }}</h3>
+      <h3>{{ total_expense|format_brl }}</h3>
       <p>Total de Despesas</p>
     </div>
     <div class="icon">
@@ -212,7 +212,7 @@
 <div class="col-md-3">
   <div class="small-box bg-info">
     <div class="inner">
-      <h3>R$ {{ "%.2f"|format(total_income - total_expense) }}</h3>
+      <h3>{{ (total_income - total_expense)|format_brl }}</h3>
       <p>Saldo do Período</p>
     </div>
     <div class="icon">
@@ -260,19 +260,19 @@
               {% for month_data in annual_data %}
               <tr>
                 <td>{{ month_data.month_name }}</td>
-                <td class="text-success">R$ {{ "%.2f"|format(month_data.income) }}</td>
-                <td class="text-danger">R$ {{ "%.2f"|format(month_data.expense) }}</td>
+                <td class="text-success">{{ month_data.income|format_brl }}</td>
+                <td class="text-danger">{{ month_data.expense|format_brl }}</td>
                 <td class="{% if month_data.income - month_data.expense >= 0 %}text-success{% else %}text-danger{% endif %}">
-                  R$ {{ "%.2f"|format(month_data.income - month_data.expense) }}
+                  {{ (month_data.income - month_data.expense)|format_brl }}
                 </td>
               </tr>
               {% endfor %}
               <tr class="table-active font-weight-bold">
                 <td>Total Anual</td>
-                <td class="text-success">R$ {{ "%.2f"|format(annual_income) }}</td>
-                <td class="text-danger">R$ {{ "%.2f"|format(annual_expense) }}</td>
+                <td class="text-success">{{ annual_income|format_brl }}</td>
+                <td class="text-danger">{{ annual_expense|format_brl }}</td>
                 <td class="{% if annual_income - annual_expense >= 0 %}text-success{% else %}text-danger{% endif %}">
-                  R$ {{ "%.2f"|format(annual_income - annual_expense) }}
+                  {{ (annual_income - annual_expense)|format_brl }}
                 </td>
               </tr>
             </tbody>
@@ -335,7 +335,7 @@
               <span class="badge bg-danger">Despesa</span>
               {% endif %}
             </td>
-            <td>R$ {{ "%.2f"|format(transaction.amount) }}</td>
+            <td>{{ transaction.amount|format_brl }}</td>
             <td>
               {% if transaction.status == 'confirmado' %}
               <span class="badge bg-success">Confirmado</span>
@@ -421,7 +421,7 @@
               <span class="badge bg-danger">Despesa</span>
               {% endif %}
             </td>
-            <td>R$ {{ "%.2f"|format(transaction.amount) }}</td>
+            <td>{{ transaction.amount|format_brl }}</td>
             <td>
               {% if transaction.status == 'confirmado' %}
               <span class="badge bg-success">Confirmado</span>
@@ -656,7 +656,7 @@ income.style.padding = '10px';
 income.style.backgroundColor = '#d4edda';
 income.style.borderRadius = '5px';
 income.style.marginRight = '10px';
-income.innerHTML = `<strong>Total de Receitas:</strong> R$ {{ "%.2f"|format(total_income) }}`;
+income.innerHTML = `<strong>Total de Receitas:</strong> {{ total_income|format_brl }}`;
 summary.appendChild(income);
 
 const expense = document.createElement('div');
@@ -665,7 +665,7 @@ expense.style.padding = '10px';
 expense.style.backgroundColor = '#f8d7da';
 expense.style.borderRadius = '5px';
 expense.style.marginRight = '10px';
-expense.innerHTML = `<strong>Total de Despesas:</strong> R$ {{ "%.2f"|format(total_expense) }}`;
+expense.innerHTML = `<strong>Total de Despesas:</strong> {{ total_expense|format_brl }}`;
 summary.appendChild(expense);
 
 const balance = document.createElement('div');
@@ -673,7 +673,7 @@ balance.style.flex = '1';
 balance.style.padding = '10px';
 balance.style.backgroundColor = '#d1ecf1';
 balance.style.borderRadius = '5px';
-balance.innerHTML = `<strong>Saldo do Período:</strong> R$ {{ "%.2f"|format(total_income - total_expense) }}`;
+balance.innerHTML = `<strong>Saldo do Período:</strong> {{ (total_income - total_expense)|format_brl }}`;
 summary.appendChild(balance);
 
 printContent.appendChild(summary);

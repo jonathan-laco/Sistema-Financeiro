@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from services import goal_service
 from datetime import datetime
+from utils.number_helpers import parse_brl_number
 
 goals_bp = Blueprint('goals', __name__, url_prefix='/goals')
 
@@ -39,8 +40,8 @@ def add():
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
-        target_amount = float(request.form.get('target_amount'))
-        current_amount = float(request.form.get('current_amount', 0))
+        target_amount = parse_brl_number(request.form.get('target_amount'))
+        current_amount = parse_brl_number(request.form.get('current_amount'), 0)
         target_date = request.form.get('target_date')
         category = request.form.get('category')
         color = request.form.get('color', '#3498db')
@@ -73,8 +74,8 @@ def edit(goal_id):
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
-        target_amount = float(request.form.get('target_amount'))
-        current_amount = float(request.form.get('current_amount', 0))
+        target_amount = parse_brl_number(request.form.get('target_amount'))
+        current_amount = parse_brl_number(request.form.get('current_amount'), 0)
         target_date = request.form.get('target_date')
         category = request.form.get('category')
         color = request.form.get('color')
@@ -113,7 +114,7 @@ def delete(goal_id):
 @goals_bp.route('/add_amount/<int:goal_id>', methods=['POST'])
 @login_required
 def add_amount(goal_id):
-    amount = float(request.form.get('amount', 0))
+    amount = parse_brl_number(request.form.get('amount'), 0)
     
     if amount <= 0:
         flash('O valor deve ser maior que zero!', 'danger')

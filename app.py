@@ -13,6 +13,7 @@ from extensions import db, login_manager
 from models.user import User
 from models.user_access_log import UserAccessLog
 from utils.date_helpers import to_local_time, format_local_datetime, get_month_name, format_date, get_now_sp
+from utils.number_helpers import format_brl, format_brl_input, format_number
 from services import config_service
 
 # Importar blueprints
@@ -85,6 +86,9 @@ def create_app(config_class=Config):
     app.jinja_env.filters['format_date'] = format_date
     app.jinja_env.filters['get_month_name'] = get_month_name
     app.jinja_env.filters['format_local_datetime'] = format_local_datetime
+    app.jinja_env.filters['format_brl'] = format_brl
+    app.jinja_env.filters['format_brl_input'] = format_brl_input
+    app.jinja_env.filters['format_number'] = format_number
     app.jinja_env.globals['to_local_time'] = to_local_time
     app.jinja_env.globals['get_now_sp'] = get_now_sp
     

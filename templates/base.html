@@ -410,6 +410,15 @@
                   <p>Adicionar Transação</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a
+                  href="{{ url_for('transactions.transfer') }}"
+                  class="nav-link {% if request.path == url_for('transactions.transfer') %}active{% endif %}"
+                >
+                  <i class="nav-icon fas fa-exchange-alt"></i>
+                  <p>Transferir entre Contas</p>
+                </a>
+              </li>
 
               <li class="nav-item">
                 <a

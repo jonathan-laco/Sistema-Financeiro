@@ -13,6 +13,9 @@
       <a href="{{ url_for('transactions.add') }}" class="btn btn-primary btn-sm">
         <i class="fas fa-plus"></i> {% if current_user.is_mei %}Nova Transação MEI{% else %}Nova Transação{% endif %}
       </a>
+      <a href="{{ url_for('transactions.transfer') }}" class="btn btn-info btn-sm ml-2">
+        <i class="fas fa-exchange-alt"></i> Transferir
+      </a>
       {% if is_mei %}
       <a href="{{ url_for('transactions.mei_transactions') }}" class="btn btn-success btn-sm ml-2">
         <i class="fas fa-building"></i> Transações MEI

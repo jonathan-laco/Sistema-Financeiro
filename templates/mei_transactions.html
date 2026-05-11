@@ -12,6 +12,9 @@
           <a href="{{ url_for('transactions.add') }}" class="btn btn-primary btn-sm">
             <i class="fas fa-plus"></i> Nova Transação MEI
           </a>
+          <a href="{{ url_for('transactions.transfer') }}" class="btn btn-info btn-sm ml-2">
+            <i class="fas fa-exchange-alt"></i> Transferir
+          </a>
         </div>
       </div>
       <!-- /.card-header -->
@@ -120,6 +123,12 @@
                   {{ transaction.description }}
                   {% if transaction.has_invoice %}
                   <span class="badge badge-info">Nota Fiscal</span>
+                  {% endif %}
+                  {% if transaction.installment_total %}
+                  <span class="badge badge-info">{{ transaction.installment_number }}/{{ transaction.installment_total }}</span>
+                  {% endif %}
+                  {% if transaction.is_salary_deductible %}
+                  <span class="badge badge-primary">Salário dia {{ transaction.salary_deduction_day }}</span>
                   {% endif %}
                 </td>
                 <td>

@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Transferir entre Contas{% endblock %}
+{% block breadcrumb %}Transferir entre Contas{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-5">
+    <div class="card card-info">
+      <div class="card-header">
+        <h3 class="card-title">Nova Transferência</h3>
+      </div>
+      <form method="post" action="{{ url_for('transactions.transfer') }}">
+        <div class="card-body">
+          {% if accounts|length < 2 %}
+          <div class="alert alert-warning">
+            Cadastre pelo menos duas contas bancárias para fazer uma transferência.
+          </div>
+          {% endif %}
+
+          <div class="form-group">
+            <label for="from_account_id">Conta de origem</label>
+            <select class="form-control" id="from_account_id" name="from_account_id" required>
+              <option value="">Selecione a conta de origem</option>
+              {% for account in accounts %}
+              <option value="{{ account.id }}">{{ account.name }} ({{ account.balance|format_brl }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="to_account_id">Conta de destino</label>
+            <select class="form-control" id="to_account_id" name="to_account_id" required>
+              <option value="">Selecione a conta de destino</option>
+              {% for account in accounts %}
+              <option value="{{ account.id }}">{{ account.name }} ({{ account.balance|format_brl }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="amount">Valor</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">R$</span>
+              </div>
+              <input type="text" class="form-control" id="amount" name="amount" placeholder="0,00" inputmode="decimal" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Descrição</label>
+            <input type="text" class="form-control" id="description" name="description" placeholder="Ex: Reserva, investimento, conta digital">
+          </div>
+
+          <div class="form-group">
+            <label for="transfer_date">Data da Transferência</label>
+            <input type="date" class="form-control" id="transfer_date" name="transfer_date" value="{{ current_date.strftime('%Y-%m-%d') }}">
+          </div>
+
+          <div class="form-group">
+            <div class="custom-control custom-checkbox">
+              <input class="custom-control-input" type="checkbox" id="is_confirmed" name="is_confirmed" checked>
+              <label for="is_confirmed" class="custom-control-label">Transferência confirmada</label>
+            </div>
+            <small class="form-text text-muted">Transferências pendentes não alteram os saldos até serem confirmadas.</small>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button type="submit" class="btn btn-info" {% if accounts|length < 2 %}disabled{% endif %}>
+            <i class="fas fa-exchange-alt"></i> Transferir
+          </button>
+          <a href="{{ url_for('transactions.index') }}" class="btn btn-default float-right">Voltar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Últimas Transferências</h3>
+      </div>
+      <div class="card-body table-responsive p-0">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Origem</th>
+              <th>Destino</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for transfer in transfers %}
+            <tr>
+              <td>{{ transfer.date.strftime('%d/%m/%Y') }}</td>
+              <td>{{ transfer.from_account.name }}</td>
+              <td>{{ transfer.to_account.name }}</td>
+              <td>{{ transfer.amount|format_brl }}</td>
+              <td>
+                {% if transfer.status == 'confirmado' %}
+                <span class="badge bg-success">Confirmado</span>
+                {% else %}
+                <span class="badge bg-warning pending-badge">Pendente</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="btn-group">
+                  {% if transfer.status == 'pendente' %}
+                  <a href="{{ url_for('transactions.confirm_transfer', transfer_id=transfer.id) }}" class="btn btn-xs btn-success">
+                    <i class="fas fa-check"></i> Confirmar
+                  </a>
+                  {% endif %}
+                  <button type="button" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#deleteTransferModal{{ transfer.id }}">
+                    <i class="fas fa-trash"></i> Excluir
+                  </button>
+                </div>
+
+                <div class="modal fade" id="deleteTransferModal{{ transfer.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Confirmar Exclusão</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <p>Tem certeza que deseja excluir esta transferência?</p>
+                        <p><strong>Origem:</strong> {{ transfer.from_account.name }}</p>
+                        <p><strong>Destino:</strong> {{ transfer.to_account.name }}</p>
+                        <p><strong>Valor:</strong> {{ transfer.amount|format_brl }}</p>
+                        {% if transfer.status == 'confirmado' %}
+                        <div class="alert alert-warning">
+                          <i class="fas fa-exclamation-triangle"></i> Excluir esta transferência irá devolver o valor para a origem e retirar o valor do destino.
+                        </div>
+                        {% endif %}
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <form action="{{ url_for('transactions.delete_transfer', transfer_id=transfer.id) }}" method="post">
+                          <button type="submit" class="btn btn-danger">Excluir</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" class="text-center">Nenhuma transferência registrada</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const fromAccount = document.getElementById('from_account_id');
+  const toAccount = document.getElementById('to_account_id');
+
+  function updateAccountOptions() {
+    const fromValue = fromAccount.value;
+    const toValue = toAccount.value;
+
+    Array.from(toAccount.options).forEach(function(option) {
+      option.disabled = option.value && option.value === fromValue;
+    });
+
+    Array.from(fromAccount.options).forEach(function(option) {
+      option.disabled = option.value && option.value === toValue;
+    });
+  }
+
+  fromAccount.addEventListener('change', updateAccountOptions);
+  toAccount.addEventListener('change', updateAccountOptions);
+  updateAccountOptions();
+});
+</script>
+{% endblock %}

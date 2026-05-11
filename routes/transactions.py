@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, send_from_directory, send_file
 from flask_login import login_required, current_user
-from services import transaction_service, account_service, category_service, invoice_service
+from services import transaction_service, account_service, category_service, invoice_service, transfer_service
 from datetime import datetime
 import os
 from flask import current_app
@@ -88,6 +88,10 @@ def add():
         description = request.form.get('description')
         category_id = request.form.get('category_id', type=int)
         is_confirmed = 'is_confirmed' in request.form
+        is_installment = 'is_installment' in request.form
+        installments = request.form.get('installments', 1, type=int)
+        is_salary_deductible = 'is_salary_deductible' in request.form
+        salary_deduction_day = request.form.get('salary_deduction_day', type=int)
         
         # Se o usuário for MEI, todas as transações são automaticamente MEI
         is_mei_transaction = current_user.is_mei
@@ -102,8 +106,34 @@ def add():
         else:
             transaction_date = get_now_sp()
         
+        if is_installment:
+            if transaction_type != 'despesa':
+                flash('Parcelamento só pode ser usado em despesas.', 'danger')
+                return redirect(url_for('transactions.add'))
+
+            transactions, message = transaction_service.create_installment_transactions(
+                current_user.id,
+                account_id,
+                category_id,
+                amount,
+                description,
+                installments,
+                is_confirmed,
+                is_mei_transaction,
+                transaction_date,
+                is_salary_deductible,
+                salary_deduction_day
+            )
+
+            if not transactions:
+                flash(message, 'danger')
+                return redirect(url_for('transactions.add'))
+
+            flash(message, 'success')
+            return redirect(url_for('transactions.index'))
+
         transaction, message = transaction_service.create_transaction(
-            current_user.id, account_id, category_id, transaction_type, 
+            current_user.id, account_id, category_id, transaction_type,
             amount, description, is_confirmed, is_mei_transaction, transaction_date
         )
         
@@ -156,6 +186,82 @@ def add():
         is_mei=current_user.is_mei,
         current_date=current_date
     )
+
+@transactions_bp.route('/transfer', methods=['GET', 'POST'])
+@login_required
+def transfer():
+    if current_user.is_admin:
+        flash('Administradores não possuem transferências.', 'info')
+        return redirect(url_for('admin.dashboard'))
+
+    accounts = account_service.get_user_accounts(current_user.id)
+
+    if request.method == 'POST':
+        from_account_id = request.form.get('from_account_id', type=int)
+        to_account_id = request.form.get('to_account_id', type=int)
+        amount = parse_brl_number(request.form.get('amount'))
+        description = request.form.get('description')
+        is_confirmed = 'is_confirmed' in request.form
+
+        transfer_date_str = request.form.get('transfer_date')
+        if transfer_date_str:
+            try:
+                transfer_date = datetime.strptime(transfer_date_str, '%Y-%m-%d')
+            except ValueError:
+                transfer_date = get_now_sp()
+        else:
+            transfer_date = get_now_sp()
+
+        transfer_record, message = transfer_service.create_transfer(
+            current_user.id,
+            from_account_id,
+            to_account_id,
+            amount,
+            description,
+            is_confirmed,
+            transfer_date
+        )
+
+        if not transfer_record:
+            flash(message, 'danger')
+            return redirect(url_for('transactions.transfer'))
+
+        flash(message, 'success')
+        return redirect(url_for('transactions.transfer'))
+
+    transfers = transfer_service.get_user_transfers(current_user.id, limit=20)
+    current_date = get_now_sp()
+
+    return render_template(
+        'transfer.html',
+        accounts=accounts,
+        transfers=transfers,
+        current_date=current_date
+    )
+
+@transactions_bp.route('/transfer/confirm/<int:transfer_id>')
+@login_required
+def confirm_transfer(transfer_id):
+    success, message = transfer_service.confirm_transfer(transfer_id, current_user.id)
+
+    if success:
+        flash(message, 'success')
+    else:
+        flash(message, 'warning')
+
+    return redirect(url_for('transactions.transfer'))
+
+@transactions_bp.route('/transfer/delete/<int:transfer_id>', methods=['POST'])
+@login_required
+def delete_transfer(transfer_id):
+    success, message = transfer_service.delete_transfer(transfer_id, current_user.id)
+
+    if success:
+        flash(message, 'success')
+    else:
+        flash(message, 'warning')
+
+    return redirect(url_for('transactions.transfer'))
 
 @transactions_bp.route('/edit/<int:transaction_id>', methods=['GET', 'POST'])
 @login_required

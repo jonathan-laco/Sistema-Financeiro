@@ -489,6 +489,15 @@
                   <p>Telegram</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a
+                  href="{{ url_for('auth.guide') }}"
+                  class="nav-link {% if request.path == url_for('auth.guide') %}active{% endif %}"
+                >
+                  <i class="nav-icon fas fa-book-open"></i>
+                  <p>Guia do Sistema</p>
+                </a>
+              </li>
               {% endif %}
 
               <li class="nav-item">
@@ -536,6 +545,15 @@
                 >
                   <i class="nav-icon fab fa-telegram-plane"></i>
                   <p>Telegram</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  href="{{ url_for('auth.guide') }}"
+                  class="nav-link {% if request.path == url_for('auth.guide') %}active{% endif %}"
+                >
+                  <i class="nav-icon fas fa-book-open"></i>
+                  <p>Guia do Sistema</p>
                 </a>
               </li>
               {% endif %}

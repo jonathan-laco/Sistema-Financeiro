@@ -298,6 +298,9 @@
           <li class="nav-item">
             <a href="{{ url_for('auth.terms') }}" class="nav-link">Termos</a>
           </li>
+          <li class="nav-item">
+            <a href="{{ url_for('auth.guide') }}" class="nav-link">Guia</a>
+          </li>
           <li class="nav-item ml-md-2">
             <a href="{{ url_for('auth.login') }}" class="btn btn-brand btn-sm px-3">Entrar agora</a>
           </li>
@@ -314,6 +317,7 @@
       <div class="hero-actions">
         <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg px-4">Criar conta</a>
         <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg px-4">Já tenho acesso</a>
+        <a href="{{ url_for('auth.guide') }}" class="btn btn-outline-light btn-lg px-4">Ver guia</a>
       </div>
     </section>
 
@@ -329,8 +333,8 @@
           </div>
           <div class="mini-feature">
             <i class="fas fa-exchange-alt"></i>
-            <strong>Transações</strong>
-            <span>Receitas e despesas</span>
+            <strong>Transferências</strong>
+            <span>Entre suas contas</span>
           </div>
           <div class="mini-feature">
             <i class="fas fa-chart-pie"></i>
@@ -338,9 +342,9 @@
             <span>Filtros e gráficos</span>
           </div>
           <div class="mini-feature">
-            <i class="fas fa-building"></i>
-            <strong>MEI</strong>
-            <span>Notas e CNPJ</span>
+            <i class="fas fa-receipt"></i>
+            <strong>Parcelas</strong>
+            <span>Compras no cartão</span>
           </div>
         </div>
       </section>

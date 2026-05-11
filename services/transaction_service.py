@@ -154,6 +154,10 @@ def create_installment_transactions(user_id, account_id, category_id, amount, de
     if first_date is None:
         first_date = get_now_sp()
 
+    base_date = first_date
+    if is_salary_deductible:
+        base_date = _get_next_monthly_date(first_date, salary_deduction_day)
+
     group_id = str(uuid4())
     total_cents = int(round(amount * 100))
     base_cents = total_cents // installments
@@ -165,7 +169,7 @@ def create_installment_transactions(user_id, account_id, category_id, amount, de
         for index in range(installments):
             parcel_cents = base_cents + (1 if index < remainder else 0)
             parcel_amount = parcel_cents / 100
-            parcel_date = _add_months(first_date, index, salary_deduction_day if is_salary_deductible else None)
+            parcel_date = _add_months(base_date, index, salary_deduction_day if is_salary_deductible else None)
             parcel_description = f"{description} ({index + 1}/{installments})"
 
             transaction = Transaction(
@@ -210,6 +214,15 @@ def _add_months(base_date, months_to_add, preferred_day=None):
     day = preferred_day or base_date.day
     last_day = calendar.monthrange(year, month)[1]
     return base_date.replace(year=year, month=month, day=min(day, last_day))
+
+def _get_next_monthly_date(base_date, preferred_day):
+    """
+    Retorna a próxima data mensal válida no dia escolhido, sem voltar para uma data passada.
+    """
+    current_month_day = _add_months(base_date, 0, preferred_day)
+    if current_month_day.date() >= base_date.date():
+        return current_month_day
+    return _add_months(base_date, 1, preferred_day)
 
 def update_transaction(transaction_id, user_id, account_id, category_id, transaction_type, amount, description, is_confirmed, is_mei_transaction=None):
     """

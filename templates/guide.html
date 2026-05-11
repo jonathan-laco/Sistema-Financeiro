@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guia do Sistema Financeiro</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+
+<style>
+  :root {
+    --guide-primary: #0f8ec7;
+    --guide-accent: #20c997;
+    --guide-ink: #12313f;
+    --guide-muted: #62737f;
+    --guide-border: #d8e7ee;
+    --guide-soft: #f5f9fb;
+    --guide-warning: #f4a261;
+    --guide-danger: #dc3545;
+    --guide-success: #28a745;
+    --guide-shadow: 0 14px 36px rgba(18, 49, 63, 0.11);
+  }
+
+  body {
+    background: #f4f6f9;
+    color: var(--guide-ink);
+  }
+
+  .guide-navbar {
+    background: #fff;
+    border-bottom: 1px solid var(--guide-border);
+    box-shadow: 0 6px 18px rgba(18, 49, 63, 0.06);
+  }
+
+  .guide-navbar .navbar-brand {
+    color: var(--guide-ink);
+    font-weight: 800;
+  }
+
+  .guide-navbar .navbar-brand i,
+  .guide-navbar .nav-link:hover {
+    color: var(--guide-primary);
+  }
+
+  .guide-navbar .nav-link {
+    color: var(--guide-muted);
+    font-weight: 700;
+  }
+
+  .guide-shell {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+  }
+
+  .guide-hero {
+    background: linear-gradient(135deg, #0f8ec7, #20c997);
+    color: #fff;
+    padding: 44px 0;
+  }
+
+  .guide-hero h1 {
+    font-size: clamp(2rem, 4vw, 3.35rem);
+    font-weight: 900;
+    line-height: 1.05;
+    margin-bottom: 14px;
+  }
+
+  .guide-hero p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.13rem;
+    max-width: 780px;
+  }
+
+  .guide-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .btn-guide-light,
+  .btn-guide-outline {
+    border-radius: 7px;
+    font-weight: 800;
+  }
+
+  .btn-guide-light {
+    background: #fff;
+    color: var(--guide-primary);
+  }
+
+  .btn-guide-outline {
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    color: #fff;
+  }
+
+  .guide-section {
+    padding: 30px 0;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .section-title i {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f7fb;
+    color: var(--guide-primary);
+  }
+
+  .section-title h2 {
+    font-size: 1.55rem;
+    font-weight: 900;
+    margin: 0;
+  }
+
+  .guide-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .guide-panel {
+    background: #fff;
+    border: 1px solid var(--guide-border);
+    border-radius: 8px;
+    box-shadow: var(--guide-shadow);
+    padding: 20px;
+  }
+
+  .guide-panel h3 {
+    align-items: center;
+    display: flex;
+    font-size: 1.1rem;
+    font-weight: 900;
+    gap: 9px;
+    margin-bottom: 10px;
+  }
+
+  .guide-panel h3 i {
+    color: var(--guide-primary);
+  }
+
+  .guide-panel p {
+    color: var(--guide-muted);
+    margin-bottom: 10px;
+  }
+
+  .guide-panel ul {
+    margin: 0;
+    padding-left: 1.15rem;
+  }
+
+  .guide-panel li {
+    color: var(--guide-muted);
+    margin-bottom: 6px;
+  }
+
+  .wide {
+    grid-column: span 2;
+  }
+
+  .full {
+    grid-column: 1 / -1;
+  }
+
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .flow-step {
+    background: var(--guide-soft);
+    border: 1px solid var(--guide-border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+
+  .flow-step strong {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .flow-step span {
+    color: var(--guide-muted);
+  }
+
+  .example-box {
+    background: #f8fbfc;
+    border: 1px dashed var(--guide-border);
+    border-radius: 8px;
+    color: var(--guide-ink);
+    font-family: Consolas, Monaco, monospace;
+    padding: 14px;
+    white-space: pre-wrap;
+  }
+
+  .rule-list {
+    columns: 2;
+  }
+
+  .tag {
+    border-radius: 999px;
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    padding: 4px 9px;
+  }
+
+  .tag-success {
+    background: rgba(40, 167, 69, 0.12);
+    color: var(--guide-success);
+  }
+
+  .tag-warning {
+    background: rgba(244, 162, 97, 0.16);
+    color: #a75f1d;
+  }
+
+  .tag-danger {
+    background: rgba(220, 53, 69, 0.12);
+    color: var(--guide-danger);
+  }
+
+  .guide-footer {
+    border-top: 1px solid var(--guide-border);
+    color: var(--guide-muted);
+    padding: 18px 0;
+  }
+
+  @media (max-width: 991px) {
+    .guide-grid,
+    .flow {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .wide {
+      grid-column: span 2;
+    }
+  }
+
+  @media (max-width: 575px) {
+    .guide-grid,
+    .flow {
+      grid-template-columns: 1fr;
+    }
+
+    .wide {
+      grid-column: span 1;
+    }
+
+    .rule-list {
+      columns: 1;
+    }
+
+    .guide-actions .btn {
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-md guide-navbar">
+  <div class="container">
+    <a href="{{ url_for('auth.index') }}" class="navbar-brand">
+      <i class="fas fa-wallet mr-2"></i>Sistema Financeiro
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#guideNavbar" aria-controls="guideNavbar" aria-expanded="false" aria-label="Abrir menu">
+      <span class="fas fa-bars"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="guideNavbar">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a href="{{ url_for('auth.index') }}" class="nav-link">Home</a></li>
+        <li class="nav-item"><a href="{{ url_for('auth.login') }}" class="nav-link">Login</a></li>
+        <li class="nav-item"><a href="{{ url_for('auth.register') }}" class="nav-link">Registrar</a></li>
+        <li class="nav-item"><a href="{{ url_for('auth.terms') }}" class="nav-link">Termos</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header class="guide-hero">
+  <div class="guide-shell">
+    <h1>Guia rápido do sistema</h1>
+    <p>Entenda para que serve cada área, quando usar cada recurso e como os lançamentos afetam saldos e relatórios.</p>
+    <div class="guide-actions">
+      {% if current_user.is_authenticated %}
+      <a href="{{ url_for('dashboard.index') }}" class="btn btn-guide-light btn-lg px-4">Ir para o dashboard</a>
+      {% else %}
+      <a href="{{ url_for('auth.register') }}" class="btn btn-guide-light btn-lg px-4">Criar conta</a>
+      <a href="{{ url_for('auth.login') }}" class="btn btn-guide-outline btn-lg px-4">Entrar</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="guide-section">
+    <div class="guide-shell">
+      <div class="section-title">
+        <i class="fas fa-route"></i>
+        <h2>Primeiros passos</h2>
+      </div>
+      <div class="flow">
+        <div class="flow-step">
+          <strong>1. Crie ou acesse sua conta</strong>
+          <span>O admin pode liberar cadastro direto ou exigir aprovação.</span>
+        </div>
+        <div class="flow-step">
+          <strong>2. Cadastre contas bancárias</strong>
+          <span>Inclua banco, carteira, reserva, investimentos ou conta digital.</span>
+        </div>
+        <div class="flow-step">
+          <strong>3. Organize categorias</strong>
+          <span>Separe receitas e despesas por tipo, nome e cor.</span>
+        </div>
+        <div class="flow-step">
+          <strong>4. Lance movimentações</strong>
+          <span>Registre receitas, despesas, parcelas e transferências.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide-section pt-0">
+    <div class="guide-shell">
+      <div class="section-title">
+        <i class="fas fa-wallet"></i>
+        <h2>Uso do dia a dia</h2>
+      </div>
+      <div class="guide-grid">
+        <article class="guide-panel">
+          <h3><i class="fas fa-tachometer-alt"></i>Dashboard</h3>
+          <p>Mostra um resumo da vida financeira sem precisar abrir relatório.</p>
+          <ul>
+            <li>Saldo total das contas.</li>
+            <li>Receitas e despesas do mês.</li>
+            <li>Saldo do mês.</li>
+            <li>Gráficos dos últimos 6 meses.</li>
+            <li>Transações recentes e pendentes.</li>
+          </ul>
+        </article>
+
+        <article class="guide-panel">
+          <h3><i class="fas fa-university"></i>Contas bancárias</h3>
+          <p>Representam onde o dinheiro está guardado.</p>
+          <ul>
+            <li>Cadastre contas com saldo inicial.</li>
+            <li>Veja o saldo atual de cada conta.</li>
+            <li>Abra as transações filtradas por conta.</li>
+            <li>Exclua apenas contas sem saldo.</li>
+          </ul>
+        </article>
+
+        <article class="guide-panel">
+          <h3><i class="fas fa-tags"></i>Categorias</h3>
+          <p>Servem para organizar lançamentos e alimentar gráficos.</p>
+          <ul>
+            <li>Categorias são separadas entre receita e despesa.</li>
+            <li>Cada categoria pode ter uma cor.</li>
+            <li>Categorias em uso não devem ser removidas.</li>
+            <li>Categorias inativas deixam de aparecer nos novos lançamentos.</li>
+          </ul>
+        </article>
+
+        <article class="guide-panel wide">
+          <h3><i class="fas fa-exchange-alt"></i>Receitas e despesas</h3>
+          <p>Use receita quando dinheiro entra e despesa quando dinheiro sai.</p>
+          <ul>
+            <li>Receita aumenta o saldo da conta quando confirmada.</li>
+            <li>Despesa diminui o saldo da conta quando confirmada.</li>
+            <li>Transação pendente fica registrada, mas não altera saldo.</li>
+            <li>Ao confirmar uma pendência, o sistema aplica o impacto no saldo.</li>
+            <li>Ao excluir uma transação confirmada, o sistema desfaz o impacto.</li>
+          </ul>
+        </article>
+
+        <article class="guide-panel">
+          <h3><i class="fas fa-clock"></i>Pendências</h3>
+          <p>Use pendente para planejar algo que ainda não aconteceu.</p>
+          <ul>
+            <li>Boletos futuros.</li>
+            <li>Receitas esperadas.</li>
+            <li>Compras que precisam ser conferidas.</li>
+            <li>Agendamentos bancários.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide-section pt-0">
+    <div class="guide-shell">
+      <div class="section-title">
+        <i class="fas fa-receipt"></i>
+        <h2>Contas parceladas</h2>
+      </div>
+      <div class="guide-grid">
+        <article class="guide-panel wide">
+          <span class="tag tag-warning">Compras no cartão, carnês e contas divididas</span>
+          <h3><i class="fas fa-calculator"></i>Como o cálculo funciona</h3>
+          <p>O sistema pega o valor total, divide pela quantidade de parcelas e cria uma despesa para cada mês.</p>
+          <ul>
+            <li>Se a divisão fechar certinho, todas as parcelas ficam iguais.</li>
+            <li>Se sobrarem centavos, eles são distribuídos nas primeiras parcelas.</li>
+            <li>Cada parcela aparece com a indicação do número, como <strong>(1/4)</strong>.</li>
+          </ul>
+        </article>
+
+        <article class="guide-panel">
+          <h3><i class="fas fa-money-check-alt"></i>Dia do salário</h3>
+          <p>Marque essa opção quando quiser planejar as parcelas pelo dia em que você recebe.</p>
+          <ul>
+            <li>Informe um dia entre 1 e 31.</li>
+            <li>As parcelas serão criadas nesse dia a cada mês.</li>
+            <li>Se o mês não tiver o dia escolhido, o sistema usa o último dia válido.</li>
+          </ul>
+        </article>
+
+        <article class="guide-panel full">
+          <h3><i class="fas fa-list-ol"></i>Exemplo de parcela</h3>
+          <div class="example-box">Valor total: R$ 100,00
+Parcelas: 3
+Resultado: 1 parcela de R$ 33,34 e 2 parcelas de R$ 33,33
+
+Na lista:
+Compra no cartão (1/3)
+Compra no cartão (2/3)
+Compra no cartão (3/3)</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide-section pt-0">
+    <div class="guide-shell">
+      <div class="section-title">
+        <i class="fas fa-random"></i>
+        <h2>Transferências entre contas</h2>
+      </div>
+      <div class="guide-grid">
+        <article class="guide-panel wide">
+          <h3><i class="fas fa-arrows-alt-h"></i>Quando usar</h3>
+          <p>Use transferência quando o dinheiro só mudou de lugar, mas continua sendo seu.</p>
+          <ul>
+            <li>Enviar dinheiro do banco principal para uma conta digital.</li>
+            <li>Separar uma parte para reserva ou investimento.</li>
+            <li>Mover saldo entre carteira, banco e conta de pagamento.</li>
+          </ul>
+        </article>
+
+        <article class="guide-panel">
+          <h3><i class="fas fa-chart-pie"></i>Por que não é despesa</h3>
+          <p>Transferência não entra nos totais de receita e despesa dos relatórios.</p>
+          <ul>
+            <li>Receita aumenta patrimônio.</li>
+            <li>Despesa diminui patrimônio.</li>
+            <li>Transferência só troca o dinheiro de conta.</li>
+          </ul>
+        </article>
+
+        <article class="guide-panel">
+          <span class="tag tag-success">Confirmada</span>
+          <h3><i class="fas fa-check-circle"></i>Altera saldos</h3>
+          <p>Quando salva confirmada, a transferência sai da origem e entra no destino imediatamente.</p>
+        </article>
+
+        <article class="guide-panel">
+          <span class="tag tag-warning">Pendente</span>
+          <h3><i class="fas fa-hourglass-half"></i>Fica planejada</h3>
+          <p>Quando está pendente, ela fica registrada, mas não altera saldo até ser confirmada.</p>
+        </article>
+
+        <article class="guide-panel">
+          <span class="tag tag-danger">Exclusão</span>
+          <h3><i class="fas fa-undo"></i>Desfaz impacto</h3>
+          <p>Excluir uma transferência confirmada devolve o valor para a origem e remove do destino.</p>
+        </article>
+
+        <article class="guide-panel full">
+          <h3><i class="fas fa-table"></i>Exemplo de transferência</h3>
+          <div class="example-box">Santander: R$ 5.000,00
+Nubank:    R$ 500,00
+
+Transferência de R$ 1.000,00 do Santander para o Nubank
+
+Santander: R$ 4.000,00
+Nubank:    R$ 1.500,00</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide-section pt-0">
+    <div class="guide-shell">
+      <div class="section-title">
+        <i class="fas fa-chart-line"></i>
+        <h2>Planejamento e análise</h2>
+      </div>
+      <div class="guide-grid">
+        <article class="guide-panel">
+          <h3><i class="fas fa-bullseye"></i>Metas financeiras</h3>
+          <p>Use metas para acompanhar objetivos como reserva, viagem, curso ou compra planejada.</p>
+          <ul>
+            <li>Informe valor alvo, valor atual e data limite.</li>
+            <li>Adicione valores ao longo do tempo.</li>
+            <li>O sistema mostra progresso e status.</li>
+            <li>A meta pode ficar em andamento, concluída ou cancelada.</li>
+          </ul>
+        </article>
+
+        <article class="guide-panel">
+          <h3><i class="fas fa-file-alt"></i>Relatórios</h3>
+          <p>Servem para entender o mês, o ano e a distribuição dos gastos.</p>
+          <ul>
+            <li>Filtre por mês, ano, conta, tipo e categoria.</li>
+            <li>Veja totais de receitas, despesas e saldo.</li>
+            <li>Use gráficos de categorias, evolução diária e últimos meses.</li>
+            <li>Imprima ou exporte para Excel.</li>
+          </ul>
+        </article>
+
+        <article class="guide-panel">
+          <h3><i class="fas fa-building"></i>MEI</h3>
+          <p>Usuários MEI têm foco em separar movimentações do CNPJ.</p>
+          <ul>
+            <li>Transações ficam marcadas como MEI.</li>
+            <li>É possível anexar nota fiscal em PDF, JPG, JPEG ou PNG.</li>
+            <li>O relatório MEI acompanha o faturamento anual.</li>
+            <li>O sistema alerta quando se aproxima do limite de R$ 81.000,00.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide-section pt-0">
+    <div class="guide-shell">
+      <div class="section-title">
+        <i class="fas fa-cogs"></i>
+        <h2>Conta, Telegram e administração</h2>
+      </div>
+      <div class="guide-grid">
+        <article class="guide-panel">
+          <h3><i class="fas fa-user-cog"></i>Configurações</h3>
+          <p>Cada usuário pode ajustar dados básicos da conta.</p>
+          <ul>
+            <li>Atualizar nome, email e foto.</li>
+            <li>Trocar senha.</li>
+            <li>Alternar entre modo claro e escuro.</li>
+            <li>Acessar atalhos para categorias e Telegram.</li>
+          </ul>
+        </article>
+
+        <article class="guide-panel">
+          <h3><i class="fab fa-telegram-plane"></i>Telegram</h3>
+          <p>Permite registrar receitas e despesas sem abrir o navegador.</p>
+          <ul>
+            <li>O usuário solicita acesso ao bot.</li>
+            <li>O admin aprova e define a validade do token.</li>
+            <li>No Telegram, use <strong>/entrar</strong> e cole o token.</li>
+            <li>Comandos úteis: <strong>/entrar</strong>, <strong>/sair</strong> e <strong>/cancelar</strong>.</li>
+          </ul>
+        </article>
+
+        <article class="guide-panel">
+          <h3><i class="fas fa-user-shield"></i>Administração</h3>
+          <p>Administradores cuidam do acesso e da saúde do sistema.</p>
+          <ul>
+            <li>Aprovar ou rejeitar novos usuários.</li>
+            <li>Ativar, desativar, editar ou excluir usuários.</li>
+            <li>Resetar senha e dados de usuários.</li>
+            <li>Ver logs de acesso.</li>
+            <li>Configurar cadastro, cadastro MEI e aprovação obrigatória.</li>
+            <li>Gerenciar tokens do Telegram.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide-section pt-0">
+    <div class="guide-shell">
+      <div class="section-title">
+        <i class="fas fa-check-double"></i>
+        <h2>Regras importantes</h2>
+      </div>
+      <article class="guide-panel">
+        <ul class="rule-list">
+          <li>O valor de transações, parcelas e transferências deve ser maior que zero.</li>
+          <li>Receitas confirmadas aumentam o saldo da conta.</li>
+          <li>Despesas confirmadas diminuem o saldo da conta.</li>
+          <li>Pendências não alteram saldo até serem confirmadas.</li>
+          <li>Contas parceladas são registradas como despesas.</li>
+          <li>Transferência precisa ter contas de origem e destino diferentes.</li>
+          <li>Transferência confirmada altera as duas contas.</li>
+          <li>Transferência pendente não altera saldo até ser confirmada.</li>
+          <li>Excluir transferência confirmada reverte o impacto nos saldos.</li>
+          <li>Transferências não entram como receita nem despesa nos relatórios.</li>
+          <li>Categorias ajudam os gráficos e relatórios ficarem corretos.</li>
+          <li>Dados MEI devem ser usados para separar o controle do CNPJ.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="guide-footer">
+  <div class="guide-shell d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+    <strong>Sistema Financeiro Pessoal e MEI</strong>
+    <span class="mt-2 mt-md-0">Guia de funcionalidades para usuários</span>
+  </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html>

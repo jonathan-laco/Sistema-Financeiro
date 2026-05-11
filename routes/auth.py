@@ -16,6 +16,10 @@ def index():
 def terms():
     return render_template('terms.html')
 
+@auth_bp.route('/guia-do-sistema')
+def guide():
+    return render_template('guide.html')
+
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:

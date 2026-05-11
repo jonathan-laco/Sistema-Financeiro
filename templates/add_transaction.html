@@ -154,8 +154,8 @@
         <!-- Campo de Data (inicialmente oculto) -->
         <div class="form-group" id="date_group" style="display: none;">
           <label for="transaction_date">Data da Transação</label>
-          <input type="date" class="form-control" id="transaction_date" name="transaction_date">
-          <small class="form-text text-muted">Selecione a data da transação. Se deixar em branco, será usada a data atual.</small>
+          <input type="date" class="form-control" id="transaction_date" name="transaction_date" value="{{ current_date.strftime('%Y-%m-%d') }}">
+          <small class="form-text text-muted">A data atual já vem preenchida. Altere apenas se a transação for de outro dia.</small>
         </div>
 
         <!-- Botão para mostrar/esconder o campo de data -->
@@ -426,13 +426,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const toggleDateBtn = document.getElementById('toggle_date_btn');
   const dateGroup = document.getElementById('date_group');
   const transactionDate = document.getElementById('transaction_date');
-  
-  // Definir a data atual como padrão
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  transactionDate.value = `${year}-${month}-${day}`;
   
   // Toggle do campo de data
   toggleDateBtn.addEventListener('click', function(e) {

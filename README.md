@@ -56,6 +56,8 @@ Este sistema foi projetado com **carinho e atenção aos detalhes**, para que vo
 
 - Controle suas contas bancárias: adicione, edite e exclua.
 - Registre receitas e despesas de forma prática.
+- Cadastre despesas parceladas, como compras no cartão, carnês e contas divididas.
+- Faça transferências entre contas sem bagunçar os relatórios de receitas e despesas.
 - Visualize relatórios financeiros mensais e anuais.
 - Crie metas financeiras e acompanhe seu progresso.
 
@@ -71,6 +73,8 @@ Este sistema foi projetado com **carinho e atenção aos detalhes**, para que vo
 - **Relatórios Personalizados**: Imprima ou exporte relatórios financeiros.
 - **Modo Claro e Escuro**: Escolha o tema que mais combina com você.
 - **Filtros Avançados**: Filtre transações por conta, categoria, tipo e presença de nota fiscal.
+- **Transferências entre Contas**: Mova dinheiro entre contas cadastradas sem registrar uma receita ou despesa falsa.
+- **Contas Parceladas**: Divida uma despesa em várias parcelas e acompanhe cada vencimento nos próximos meses.
 - **Gráficos Interativos**: Visualize dados financeiros com gráficos dinâmicos (requer internet para carregar via CDN).
 - **Integração com Telegram**: Registre receitas e despesas direto pelo bot, usando os comandos `/entrar`, `/sair` e `/cancelar`, com autenticação por token aprovado pelo administrador.
 
@@ -100,20 +104,111 @@ Este sistema foi projetado com **carinho e atenção aos detalhes**, para que vo
 
 ## 🛠️ Como Usar
 
-1. **Login Inicial**:
+1. **Login Inicial**
    - **Administrador**:
      - Usuário: `admin`
      - Senha: `admin123`
    - Após o login, configure o sistema e gerencie usuários.
-2. **Usuários**:
+
+2. **Usuários**
    - Cadastre-se (se permitido) ou peça aprovação do administrador.
    - Comece a gerenciar suas contas, transações e metas.
-3. **Relatórios**:
+
+3. **Contas bancárias**
+   - Cadastre suas contas, como banco principal, carteira, conta digital, reserva ou investimentos.
+   - O saldo de cada conta é atualizado automaticamente quando uma transação ou transferência confirmada é registrada.
+
+4. **Receitas e despesas**
+   - Use **receita** para dinheiro que entrou, como salário, venda, rendimento ou recebimento.
+   - Use **despesa** para dinheiro que saiu, como mercado, aluguel, cartão, boleto ou serviço.
+   - Uma transação confirmada altera o saldo da conta.
+   - Uma transação pendente fica registrada, mas ainda não muda o saldo.
+
+5. **Contas parceladas**
+   - Use **Conta parcelada** quando uma despesa for dividida em várias vezes, como compra no cartão, carnê ou conta combinada.
+   - Informe o valor total e a quantidade de parcelas.
+   - O sistema divide o valor total pela quantidade de parcelas e cria uma despesa para cada mês.
+   - Se a divisão tiver centavos sobrando, eles são distribuídos nas primeiras parcelas.
+
+   Exemplo:
+
+   - Valor total: R$ 100,00
+   - Parcelas: 3
+   - Resultado: 1 parcela de R$ 33,34 e 2 parcelas de R$ 33,33
+
+   Cada parcela aparece separada na lista:
+
+   - `Compra no cartão (1/3)`
+   - `Compra no cartão (2/3)`
+   - `Compra no cartão (3/3)`
+
+6. **Parcelas no dia do salário**
+   - Marque **Pode descontar/planejar pelo dia do salário** quando quiser que cada parcela caia sempre no mesmo dia do mês.
+   - Informe o dia do salário, por exemplo `5`.
+   - O sistema cria as parcelas mensais usando esse dia.
+   - Se o mês não tiver o dia escolhido, como dia 31 em fevereiro, será usado o último dia válido daquele mês.
+
+7. **Transferências entre contas**
+   - Use transferência quando o dinheiro apenas mudou de uma conta para outra.
+   - Exemplo: você recebeu o salário no Santander e transferiu uma parte para o Nubank ou para uma reserva.
+   - Nesse caso, não registre como despesa nem como nova receita, porque o dinheiro continua sendo seu.
+
+   Ao cadastrar uma transferência, o sistema pede:
+
+   - Conta de origem
+   - Conta de destino
+   - Valor
+   - Descrição opcional
+   - Data
+   - Status: confirmada ou pendente
+
+   Quando a transferência está confirmada, o sistema:
+
+   - Subtrai o valor da conta de origem.
+   - Soma o mesmo valor na conta de destino.
+
+   Exemplo:
+
+   ```text
+   Santander: R$ 5.000,00
+   Nubank:    R$ 500,00
+
+   Transferência de R$ 1.000,00 do Santander para o Nubank
+
+   Santander: R$ 4.000,00
+   Nubank:    R$ 1.500,00
+   ```
+
+   Uma transferência pendente fica registrada, mas ainda não altera os saldos. Quando você confirmar, o sistema aplica a saída e a entrada.
+
+8. **Exclusão de transferência**
+   - Se uma transferência confirmada for excluída, o sistema desfaz o impacto nos saldos.
+   - O valor volta para a conta de origem.
+   - O mesmo valor é removido da conta de destino.
+   - Se a transferência era pendente, o sistema apenas remove o registro.
+
+9. **Relatórios**
    - Acesse relatórios mensais ou anuais e imprima ou exporte para Excel.
-4. **Telegram**:
+   - Transferências não entram como receita nem despesa.
+   - Isso evita que o relatório mostre uma saída ou entrada falsa quando o dinheiro só mudou de lugar.
+
+10. **Telegram**
    - Em Configurações > Telegram, solicite acesso ao bot.
    - Após a aprovação do administrador, copie o token gerado.
    - No Telegram, use `/entrar`, cole o token e registre transações pelo menu guiado.
+
+---
+
+## 📌 Regras importantes
+
+- A conta de origem e a conta de destino de uma transferência devem ser diferentes.
+- O valor de uma transação, parcela ou transferência precisa ser maior que zero.
+- Transferências confirmadas alteram saldos.
+- Transferências pendentes não alteram saldos até serem confirmadas.
+- Excluir uma transferência confirmada reverte o impacto nos saldos.
+- Contas parceladas são registradas como despesas.
+- Parcelas confirmadas afetam o saldo da conta.
+- Parcelas pendentes ficam planejadas para acompanhamento futuro.
 
 ---
 

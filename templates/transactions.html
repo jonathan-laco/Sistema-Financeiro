@@ -147,6 +147,12 @@
               {% if transaction.is_mei_transaction %}
                 <span class="badge badge-success">MEI</span>
               {% endif %}
+              {% if transaction.installment_total %}
+                <span class="badge badge-info">{{ transaction.installment_number }}/{{ transaction.installment_total }}</span>
+              {% endif %}
+              {% if transaction.is_salary_deductible %}
+                <span class="badge badge-primary">Salário dia {{ transaction.salary_deduction_day }}</span>
+              {% endif %}
             </td>
             <td>
               {% for category in current_user.categories %}

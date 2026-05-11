@@ -113,6 +113,38 @@
             <input type="text" class="form-control" id="amount" name="amount" placeholder="0,00" inputmode="decimal" required>
           </div>
         </div>
+
+        <div class="form-group" id="installment_toggle_group">
+          <div class="custom-control custom-checkbox">
+            <input class="custom-control-input" type="checkbox" id="is_installment" name="is_installment">
+            <label for="is_installment" class="custom-control-label">Conta parcelada</label>
+          </div>
+          <small class="form-text text-muted">Use para compras no cartão ou contas divididas em várias vezes.</small>
+        </div>
+
+        <div id="installment_fields" style="display: none;">
+          <div class="form-group">
+            <label for="installments">Quantidade de parcelas</label>
+            <input type="number" class="form-control" id="installments" name="installments" min="2" max="120" value="2">
+          </div>
+
+          <div class="form-group">
+            <div class="custom-control custom-checkbox">
+              <input class="custom-control-input" type="checkbox" id="is_salary_deductible" name="is_salary_deductible">
+              <label for="is_salary_deductible" class="custom-control-label">Pode descontar/planejar pelo dia do salário</label>
+            </div>
+            <small class="form-text text-muted">Ao marcar, cada parcela será lançada no dia informado do mês.</small>
+          </div>
+
+          <div class="form-group" id="salary_day_group" style="display: none;">
+            <label for="salary_deduction_day">Dia do salário</label>
+            <input type="number" class="form-control" id="salary_deduction_day" name="salary_deduction_day" min="1" max="31" placeholder="Ex: 5">
+          </div>
+
+          <div class="alert alert-info py-2" id="installment_preview">
+            Informe valor e parcelas para ver o cálculo.
+          </div>
+        </div>
         
         <div class="form-group">
           <label for="description">Descrição</label>
@@ -265,6 +297,71 @@ document.addEventListener('DOMContentLoaded', function() {
   const incomeCategories = document.getElementById('income_categories');
   const expenseCategories = document.getElementById('expense_categories');
   const categorySelect = document.getElementById('category_id');
+  const installmentToggleGroup = document.getElementById('installment_toggle_group');
+  const isInstallment = document.getElementById('is_installment');
+  const installmentFields = document.getElementById('installment_fields');
+  const installmentsInput = document.getElementById('installments');
+  const amountInput = document.getElementById('amount');
+  const installmentPreview = document.getElementById('installment_preview');
+  const isSalaryDeductible = document.getElementById('is_salary_deductible');
+  const salaryDayGroup = document.getElementById('salary_day_group');
+  const salaryDeductionDay = document.getElementById('salary_deduction_day');
+
+  function parseBrlAmount(value) {
+    if (!value) {
+      return 0;
+    }
+
+    const normalized = value.replace(/\./g, '').replace(',', '.').replace(/[^\d.]/g, '');
+    return Number.parseFloat(normalized) || 0;
+  }
+
+  function formatBrlAmount(value) {
+    return value.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
+  }
+
+  function updateInstallmentPreview() {
+    const total = parseBrlAmount(amountInput.value);
+    const installments = Number.parseInt(installmentsInput.value, 10) || 0;
+
+    if (!total || installments < 2) {
+      installmentPreview.textContent = 'Informe valor e parcelas para ver o cálculo.';
+      return;
+    }
+
+    const cents = Math.round(total * 100);
+    const baseCents = Math.floor(cents / installments);
+    const remainder = cents % installments;
+    const firstValue = (baseCents + (remainder > 0 ? 1 : 0)) / 100;
+    const regularValue = baseCents / 100;
+
+    if (remainder > 0) {
+      installmentPreview.textContent = `${installments} parcelas: ${remainder} parcela(s) de ${formatBrlAmount(firstValue)} e ${installments - remainder} parcela(s) de ${formatBrlAmount(regularValue)}.`;
+    } else {
+      installmentPreview.textContent = `${installments} parcelas de ${formatBrlAmount(regularValue)}.`;
+    }
+  }
+
+  function updateInstallmentFields() {
+    const isExpense = typeExpense.checked;
+    installmentToggleGroup.style.display = isExpense ? 'block' : 'none';
+
+    if (!isExpense) {
+      isInstallment.checked = false;
+    }
+
+    installmentFields.style.display = isInstallment.checked ? 'block' : 'none';
+    installmentsInput.required = isInstallment.checked;
+    updateInstallmentPreview();
+  }
+
+  function updateSalaryDayFields() {
+    salaryDayGroup.style.display = isSalaryDeductible.checked ? 'block' : 'none';
+    salaryDeductionDay.required = isSalaryDeductible.checked;
+  }
   
   function updateCategories() {
     // Limpar seleção atual
@@ -297,13 +394,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     }
+
+    updateInstallmentFields();
   }
   
   typeIncome.addEventListener('change', updateCategories);
   typeExpense.addEventListener('change', updateCategories);
+  isInstallment.addEventListener('change', updateInstallmentFields);
+  installmentsInput.addEventListener('input', updateInstallmentPreview);
+  amountInput.addEventListener('input', updateInstallmentPreview);
+  isSalaryDeductible.addEventListener('change', updateSalaryDayFields);
   
   // Inicializar
   updateCategories();
+  updateSalaryDayFields();
   
   // Destacar a categoria selecionada com sua cor
   categorySelect.addEventListener('change', function() {

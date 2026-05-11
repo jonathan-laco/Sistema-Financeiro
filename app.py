@@ -7,6 +7,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import pytz
 import requests
+from sqlalchemy import inspect, text
 
 from config import Config
 from extensions import db, login_manager
@@ -65,6 +66,7 @@ def create_app(config_class=Config):
     # Criar tabelas do banco de dados
     with app.app_context():
         db.create_all()
+        ensure_transaction_installment_columns()
         # Inicializar configurações padrão
         config_service.initialize_default_configs()
     
@@ -118,6 +120,29 @@ def create_app(config_class=Config):
         return render_template('errors/500.html'), 500
     
     return app
+
+def ensure_transaction_installment_columns():
+    """
+    Adiciona campos de parcelamento em bancos existentes.
+    """
+    inspector = inspect(db.engine)
+    if 'transaction' not in inspector.get_table_names():
+        return
+
+    existing_columns = {column['name'] for column in inspector.get_columns('transaction')}
+    columns_to_add = {
+        'installment_group_id': 'VARCHAR(36)',
+        'installment_number': 'INTEGER',
+        'installment_total': 'INTEGER',
+        'is_salary_deductible': 'BOOLEAN DEFAULT 0',
+        'salary_deduction_day': 'INTEGER'
+    }
+
+    for column_name, column_type in columns_to_add.items():
+        if column_name not in existing_columns:
+            db.session.execute(text(f'ALTER TABLE "transaction" ADD COLUMN {column_name} {column_type}'))
+
+    db.session.commit()
 
 # Criar a aplicação
 app = create_app()

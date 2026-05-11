@@ -3,6 +3,8 @@ from extensions import db
 from datetime import datetime
 from sqlalchemy import extract
 from utils.date_helpers import get_now_sp
+from uuid import uuid4
+import calendar
 
 def get_user_transactions(user_id, filters=None, page=1, per_page=20):
     """
@@ -65,7 +67,7 @@ def get_transaction_by_id(transaction_id, user_id):
     """
     return Transaction.query.filter_by(id=transaction_id, user_id=user_id, is_deleted=False).first()
 
-def create_transaction(user_id, account_id, category_id, transaction_type, amount, description, is_confirmed=True, is_mei_transaction=False, transaction_date=None):
+def create_transaction(user_id, account_id, category_id, transaction_type, amount, description, is_confirmed=True, is_mei_transaction=False, transaction_date=None, installment_info=None):
     """
     Cria uma nova transação
     """
@@ -104,6 +106,13 @@ def create_transaction(user_id, account_id, category_id, transaction_type, amoun
         is_mei_transaction=is_mei_transaction,
         has_invoice=False
     )
+
+    if installment_info:
+        new_transaction.installment_group_id = installment_info.get('group_id')
+        new_transaction.installment_number = installment_info.get('number')
+        new_transaction.installment_total = installment_info.get('total')
+        new_transaction.is_salary_deductible = installment_info.get('is_salary_deductible', False)
+        new_transaction.salary_deduction_day = installment_info.get('salary_deduction_day')
     
     db.session.add(new_transaction)
     
@@ -116,6 +125,91 @@ def create_transaction(user_id, account_id, category_id, transaction_type, amoun
     
     db.session.commit()
     return new_transaction, "Transação adicionada com sucesso"
+
+def create_installment_transactions(user_id, account_id, category_id, amount, description, installments, is_confirmed=True, is_mei_transaction=False, first_date=None, is_salary_deductible=False, salary_deduction_day=None):
+    """
+    Cria transações de despesa parcelada, dividindo o valor total em parcelas mensais.
+    """
+    account = BankAccount.query.filter_by(id=account_id, user_id=user_id).first()
+    if not account:
+        return None, "Conta inválida"
+
+    category = Category.query.filter_by(id=category_id, user_id=user_id, is_active=True).first()
+    if not category:
+        return None, "Categoria inválida"
+
+    if category.type != 'despesa':
+        return None, "A categoria selecionada não é válida para despesa"
+
+    if installments < 2:
+        return None, "Informe pelo menos 2 parcelas"
+
+    if amount <= 0:
+        return None, "Informe um valor válido"
+
+    if is_salary_deductible:
+        if not salary_deduction_day or salary_deduction_day < 1 or salary_deduction_day > 31:
+            return None, "Informe um dia de salário entre 1 e 31"
+
+    if first_date is None:
+        first_date = get_now_sp()
+
+    group_id = str(uuid4())
+    total_cents = int(round(amount * 100))
+    base_cents = total_cents // installments
+    remainder = total_cents % installments
+    created_transactions = []
+    status = 'confirmado' if is_confirmed else 'pendente'
+
+    try:
+        for index in range(installments):
+            parcel_cents = base_cents + (1 if index < remainder else 0)
+            parcel_amount = parcel_cents / 100
+            parcel_date = _add_months(first_date, index, salary_deduction_day if is_salary_deductible else None)
+            parcel_description = f"{description} ({index + 1}/{installments})"
+
+            transaction = Transaction(
+                user_id=user_id,
+                account_id=account_id,
+                category_id=category_id,
+                type='despesa',
+                amount=parcel_amount,
+                description=parcel_description,
+                status=status,
+                is_confirmed=is_confirmed,
+                date=parcel_date,
+                is_mei_transaction=is_mei_transaction,
+                has_invoice=False,
+                installment_group_id=group_id,
+                installment_number=index + 1,
+                installment_total=installments,
+                is_salary_deductible=is_salary_deductible,
+                salary_deduction_day=salary_deduction_day if is_salary_deductible else None
+            )
+
+            db.session.add(transaction)
+            created_transactions.append(transaction)
+
+        if status == 'confirmado':
+            account.balance -= amount
+
+        db.session.commit()
+    except Exception as exc:
+        db.session.rollback()
+        return None, f"Erro ao criar parcelas: {str(exc)}"
+
+    return created_transactions, f"{installments} parcelas cadastradas com sucesso"
+
+def _add_months(base_date, months_to_add, preferred_day=None):
+    """
+    Soma meses preservando o horário e ajustando o dia para o último dia válido do mês.
+    """
+    month_index = base_date.month - 1 + months_to_add
+    year = base_date.year + month_index // 12
+    month = month_index % 12 + 1
+    day = preferred_day or base_date.day
+    last_day = calendar.monthrange(year, month)[1]
+    return base_date.replace(year=year, month=month, day=min(day, last_day))
 
 def update_transaction(transaction_id, user_id, account_id, category_id, transaction_type, amount, description, is_confirmed, is_mei_transaction=None):
     """

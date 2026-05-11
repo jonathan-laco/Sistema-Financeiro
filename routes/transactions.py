@@ -88,6 +88,10 @@ def add():
         description = request.form.get('description')
         category_id = request.form.get('category_id', type=int)
         is_confirmed = 'is_confirmed' in request.form
+        is_installment = 'is_installment' in request.form
+        installments = request.form.get('installments', 1, type=int)
+        is_salary_deductible = 'is_salary_deductible' in request.form
+        salary_deduction_day = request.form.get('salary_deduction_day', type=int)
         
         # Se o usuário for MEI, todas as transações são automaticamente MEI
         is_mei_transaction = current_user.is_mei
@@ -102,8 +106,34 @@ def add():
         else:
             transaction_date = get_now_sp()
         
+        if is_installment:
+            if transaction_type != 'despesa':
+                flash('Parcelamento só pode ser usado em despesas.', 'danger')
+                return redirect(url_for('transactions.add'))
+
+            transactions, message = transaction_service.create_installment_transactions(
+                current_user.id,
+                account_id,
+                category_id,
+                amount,
+                description,
+                installments,
+                is_confirmed,
+                is_mei_transaction,
+                transaction_date,
+                is_salary_deductible,
+                salary_deduction_day
+            )
+
+            if not transactions:
+                flash(message, 'danger')
+                return redirect(url_for('transactions.add'))
+
+            flash(message, 'success')
+            return redirect(url_for('transactions.index'))
+
         transaction, message = transaction_service.create_transaction(
-            current_user.id, account_id, category_id, transaction_type, 
+            current_user.id, account_id, category_id, transaction_type,
             amount, description, is_confirmed, is_mei_transaction, transaction_date
         )
         
